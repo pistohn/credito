@@ -598,8 +598,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 // ══════════════════════════════════════════
 //  CONFIG — REEMPLAZAR CON TUS DATOS DE SUPABASE
 // ══════════════════════════════════════════
-const SUPABASE_URL  = 'https://smaqcarchvtniimryxyr.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtYXFjYXJjaHZ0bmlpbXJ5eHlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNjA5MjEsImV4cCI6MjA5NzgzNjkyMX0.7ZGSYlKKnJFtAPBf7t7eXsiMdcMz9Z67U5LZxcLgzEU';
+const SUPABASE_URL  = 'https://TU_PROYECTO.supabase.co';
+const SUPABASE_ANON = 'TU_ANON_KEY';
 
 // ══════════════════════════════════════════
 //  INIT
@@ -1145,12 +1145,101 @@ async function openEvalAnalista(id){
   // Inicializar criterios
   criterioState={};
   CRITERIOS.forEach(c=>{criterioState[c.key]=null;});
-
   renderCriterioGrid();
+
+  // ── Cargar requisitos por tipo desde BD ──
+  await cargarRequisitosAnalista(s);
+
   document.getElementById('analNotas').value='';
 
   closeOverlay('modalDetalle');
   openOverlay('modalAnalista');
+}
+
+// ── Requisitos dinámicos del analista ──────────────────
+let requisitosDB = [];     // catálogo cargado de BD
+let requisitosState = {};  // key -> {checked, etiqueta, aplica_a}
+
+async function cargarRequisitosAnalista(sol){
+  // Cargar catálogo del tipo de solicitud
+  const {data}=await db.from('requisitos_tipo')
+    .select('*')
+    .or(`tipo.eq.${sol.tipo},tipo.eq.todos`)
+    .eq('activo',true)
+    .order('orden');
+  requisitosDB=data||[];
+
+  // Si la solicitud ya tenía requisitos asignados, usar esos; si no, preseleccionar los del catálogo
+  const yaAsignados=sol.requisitos_asignados&&Object.keys(sol.requisitos_asignados).length>0;
+  requisitosState={};
+  requisitosDB.forEach(r=>{
+    requisitosState[r.clave]={
+      checked: yaAsignados ? (sol.requisitos_asignados[r.clave]||false) : true,
+      etiqueta: r.etiqueta,
+      aplica_a: r.aplica_a,
+    };
+  });
+
+  renderRequisitosGrid();
+}
+
+function renderRequisitosGrid(){
+  // Buscar contenedor (lo insertamos dinámicamente en el modal)
+  let cont=document.getElementById('reqGridContainer');
+  if(!cont){
+    // Insertarlo en el modal del analista, después del criterioGrid
+    const evalW=document.getElementById('evalWarning');
+    if(evalW){
+      const div=document.createElement('div');div.id='reqGridContainer';
+      evalW.parentNode.insertBefore(div,evalW.nextSibling);
+      cont=div;
+    }
+  }
+  if(!cont) return;
+
+  const porAsesor=requisitosDB.filter(r=>r.aplica_a==='asesor'||r.aplica_a==='ambos');
+  const porVerif=requisitosDB.filter(r=>r.aplica_a==='verificador'||r.aplica_a==='ambos');
+
+  let h=`<div style="margin-top:14px">
+    <div class="section-sep" style="margin-bottom:10px">📋 Requisitos de la solicitud — personaliza según el caso</div>`;
+
+  if(porAsesor.length){
+    h+=`<div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:.4px;text-transform:uppercase;margin-bottom:7px">Para el asesor (documentos)</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+    ${porAsesor.map(r=>{
+      const st=requisitosState[r.clave];
+      return`<label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);border:1.5px solid ${st?.checked?'rgba(59,130,246,.4)':'var(--border)'};border-radius:var(--r-sm);cursor:pointer;transition:all .2s;user-select:none">
+        <input type="checkbox" id="req_${r.clave}" ${st?.checked?'checked':''} onchange="toggleReq('${r.clave}')" style="width:16px;height:16px;accent-color:var(--primary);flex-shrink:0;cursor:pointer">
+        <span style="font-size:13px;font-weight:500">${esc(r.etiqueta)}</span>
+      </label>`;
+    }).join('')}
+    </div>`;
+  }
+
+  if(porVerif.length){
+    h+=`<div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.4px;text-transform:uppercase;margin-bottom:7px">Para el verificador (campo)</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+    ${porVerif.map(r=>{
+      const st=requisitosState[r.clave];
+      return`<label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);border:1.5px solid ${st?.checked?'rgba(245,158,11,.4)':'var(--border)'};border-radius:var(--r-sm);cursor:pointer;transition:all .2s;user-select:none">
+        <input type="checkbox" id="req_${r.clave}" ${st?.checked?'checked':''} onchange="toggleReq('${r.clave}')" style="width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;cursor:pointer">
+        <span style="font-size:13px;font-weight:500">${esc(r.etiqueta)}</span>
+      </label>`;
+    }).join('')}
+    </div>`;
+  }
+  h+=`</div>`;
+  cont.innerHTML=h;
+}
+
+function toggleReq(clave){
+  if(requisitosState[clave]) requisitosState[clave].checked=!requisitosState[clave].checked;
+  // Actualizar borde visual
+  const label=document.getElementById('req_'+clave)?.parentElement;
+  if(label){
+    const st=requisitosState[clave];
+    label.style.borderColor=st?.checked?(st.aplica_a==='verificador'?'rgba(245,158,11,.4)':'rgba(59,130,246,.4)'):'var(--border)';
+  }
 }
 
 function renderCriterioGrid(){
@@ -1163,10 +1252,8 @@ function renderCriterioGrid(){
       <div class="criterio-label">${esc(c.label)}</div>
     </div>`;
   }).join('');
-  // Mostrar warning si hay alguno en false
   const hasFailure=Object.values(criterioState).some(v=>v===false);
   document.getElementById('evalWarning').classList.toggle('show',hasFailure);
-  // Deshabilitar aprobar si hay fallo
   document.getElementById('btnAprobar').disabled=hasFailure;
 }
 
@@ -1180,7 +1267,6 @@ async function decidirAnalista(decision){
   const notas=document.getElementById('analNotas').value.trim();
   if(!notas){toast('Las notas son obligatorias','error');return;}
 
-  // Validar que todos están evaluados si se va a aprobar
   if(decision==='aprobado'){
     const sinEvaluar=CRITERIOS.filter(c=>criterioState[c.key]===null);
     if(sinEvaluar.length){toast('Evalúa todos los criterios primero','error');return;}
@@ -1190,6 +1276,14 @@ async function decidirAnalista(decision){
 
   const criterioPayload={};
   CRITERIOS.forEach(c=>{criterioPayload[c.key]=criterioState[c.key];});
+
+  // Construir requisitos asignados (solo los marcados)
+  const reqAsignados={};
+  const reqLabels={};
+  Object.entries(requisitosState).forEach(([k,v])=>{
+    reqAsignados[k]=v.checked;
+    if(v.checked) reqLabels[k]=v.etiqueta;
+  });
 
   const estatusNuevo=decision==='aprobado'?'aprobado':decision==='cancelado'?'cancelado':'rechazado';
 
@@ -1201,6 +1295,8 @@ async function decidirAnalista(decision){
     ...criterioPayload,
     notas_analista:notas,
     decision_analista:decision,
+    requisitos_asignados:reqAsignados,
+    requisitos_asignados_labels:reqLabels,
     ...(decision==='aprobado'?{}:{fecha_fin:now()}),
     actualizado_por:SESSION.nombre,
   }).eq('id',analSolId).select().single();
@@ -1208,21 +1304,19 @@ async function decidirAnalista(decision){
   if(error){toast('Error: '+error.message,'error');return;}
 
   const accion=decision==='aprobado'
-    ?`Aprobado por analista ${SESSION.nombre}`
+    ?`Aprobado por analista ${SESSION.nombre} — ${Object.values(reqLabels).filter((_,i)=>Object.values(reqAsignados)[i]).length} requisitos asignados`
     :decision==='cancelado'
     ?`Cancelado por analista ${SESSION.nombre}: ${notas}`
     :`Rechazado por analista ${SESSION.nombre}: ${notas}`;
 
   await registrarHistorial(analSolId,accion,estatusNuevo,'en_analisis');
 
-  // Notificar verificadores si fue aprobado
   if(decision==='aprobado'){
-    await notificarRol('verificador',analSolId,`Solicitud aprobada para verificación: ${data.cliente} — ${fmtMoney(data.monto)}`,'asignacion');
+    await notificarRol('verificador',analSolId,`Solicitud aprobada: ${data.cliente} — ${fmtMoney(data.monto)}`,'asignacion');
     toast('Solicitud aprobada. Verificadores notificados.','success');
   } else {
     toast(`Solicitud ${decision}`,'warning');
   }
-
   closeOverlay('modalAnalista');
 }
 
@@ -1306,50 +1400,91 @@ function initMapa(){
   }).addTo(mapaL);
 }
 
+// Colores únicos por verificador
+const VERIF_COLORS=['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F97316','#EC4899'];
+let rutasLayer={};
+
 async function actualizarMapa(){
   initMapa();
   const verifs=await cargarUbicaciones();
   const ahora=Date.now();
 
-  // Limpiar markers viejos
-  Object.values(mapaMarkers).forEach(m=>m.remove());
+  // Limpiar markers y rutas anteriores
+  Object.values(mapaMarkers).forEach(m=>{try{m.remove();}catch(e){}});
   mapaMarkers={};
+  Object.values(rutasLayer).forEach(r=>{try{r.remove();}catch(e){}});
+  rutasLayer={};
 
   const lista=document.getElementById('verifList');
   if(!verifs.length){
-    lista.innerHTML=`<div class="empty-state" style="padding:24px"><div class="empty-title">Sin verificadores</div><div class="empty-sub">Nadie ha compartido ubicación</div></div>`;
+    lista.innerHTML=`<div class="empty-state" style="padding:24px"><div class="empty-title">Sin verificadores</div><div class="empty-sub">Nadie ha compartido ubicación hoy</div></div>`;
     return;
   }
 
   lista.innerHTML='';
-  verifs.forEach(v=>{
-    if(!v.lat||!v.lng)return;
+  const bounds=[];
+
+  for(let vi=0;vi<verifs.length;vi++){
+    const v=verifs[vi];
+    if(!v.lat||!v.lng) continue;
     const mins=Math.floor((ahora-new Date(v.updated_at).getTime())/60000);
     const activo=v.activo&&mins<10;
-    const color=activo?'#10B981':'#6B7280';
+    const color=VERIF_COLORS[vi%VERIF_COLORS.length];
 
-    // Marker SVG
+    // ── Cargar historial GPS del día ──
+    const hoy=new Date().toISOString().slice(0,10);
+    const {data:gpsHist}=await db.from('historial_gps_verificador')
+      .select('lat,lng,timestamp')
+      .eq('verificador_id',v.verificador_id)
+      .eq('fecha_dia',hoy)
+      .order('timestamp',{ascending:true});
+
+    // Dibujar ruta del día como polyline
+    if(gpsHist&&gpsHist.length>1){
+      const lls=gpsHist.map(g=>[g.lat,g.lng]);
+      const ruta=L.polyline(lls,{color,weight:3,opacity:.65,dashArray:'none'}).addTo(mapaL);
+      rutasLayer[v.verificador_id]=ruta;
+      lls.forEach(ll=>bounds.push(ll));
+
+      // Marcador de inicio del día
+      const inicio=gpsHist[0];
+      L.circleMarker([inicio.lat,inicio.lng],{radius:5,color,fillColor:color,fillOpacity:.7,weight:2})
+        .addTo(mapaL)
+        .bindPopup(`<strong>${v.nombre}</strong><br>Inicio: ${new Date(inicio.timestamp).toLocaleTimeString('es-HN',{hour:'2-digit',minute:'2-digit'})}`);
+    }
+
+    // ── Marker posición actual ──
     const icon=L.divIcon({
-      html:`<div style="width:36px;height:36px;border-radius:50%;background:${color};border:3px solid ${activo?'#34D39980':'#9CA3AF80'};display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.5)">👤</div>`,
-      className:'',iconSize:[36,36],iconAnchor:[18,18]
+      html:`<div style="width:38px;height:38px;border-radius:50%;background:${activo?color:'#4B5563'};border:3px solid ${activo?color+'99':'#6B728099'};display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 10px rgba(0,0,0,.5);transition:all .3s">👤</div>`,
+      className:'',iconSize:[38,38],iconAnchor:[19,19]
     });
-
     const marker=L.marker([v.lat,v.lng],{icon}).addTo(mapaL);
-    marker.bindPopup(`<strong>${v.nombre}</strong><br>${activo?'🟢 Activo':'⚫ Inactivo'}<br>Hace ${mins} min`);
+    marker.bindPopup(`<div style="font-family:sans-serif;min-width:140px">
+      <strong style="font-size:14px">${v.nombre}</strong><br>
+      <span style="color:${activo?'#10B981':'#9CA3AF'}">${activo?'🟢 En campo':'⚫ Inactivo'}</span><br>
+      <span style="font-size:12px;color:#6B7280">Hace ${mins} min</span>
+      ${gpsHist?.length?`<br><span style="font-size:12px;color:#6B7280">${gpsHist.length} puntos registrados hoy</span>`:''}
+    </div>`);
     mapaMarkers[v.verificador_id]=marker;
+    bounds.push([v.lat,v.lng]);
 
-    // Lista lateral
+    // ── Lista lateral ──
     const div=document.createElement('div');
     div.className='verif-item';
-    div.innerHTML=`<div style="display:flex;align-items:center;gap:8px">
-      <div class="verif-item-dot" style="background:${color}"></div>
-      <div><div class="verif-item-name">${esc(v.nombre)}</div>
-      <div class="verif-item-status">Hace ${mins} min · ${activo?'Activo':'Inactivo'}</div></div>
-    </div>`;
-    div.onclick=()=>mapaL.flyTo([v.lat,v.lng],16);
+    div.innerHTML=`
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="verif-item-dot" style="background:${activo?color:'#4B5563'}"></div>
+        <div style="flex:1">
+          <div class="verif-item-name">${esc(v.nombre)}</div>
+          <div class="verif-item-status">${activo?`Activo · hace ${mins} min`:`Inactivo · hace ${mins} min`}</div>
+          ${gpsHist?.length?`<div style="font-size:10px;color:var(--text-f);margin-top:1px">${gpsHist.length} pts registrados hoy</div>`:''}
+        </div>
+      </div>`;
+    div.onclick=()=>{mapaL.flyTo([v.lat,v.lng],16);marker.openPopup();};
     lista.appendChild(div);
-  });
+  }
 
+  if(bounds.length) mapaL.fitBounds(L.latLngBounds(bounds),{padding:[20,20]});
   document.getElementById('mapaLastUpdate').textContent='Actualizado: '+new Date().toLocaleTimeString('es-HN');
 }
 

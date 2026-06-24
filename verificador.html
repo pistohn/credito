@@ -9,99 +9,75 @@
 <title>VerifiCrédito — Verificador</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg:        #06080F;
-  --bg2:       #0C1120;
-  --surface:   #111827;
-  --card:      #161E2E;
-  --card-h:    #1C2640;
-  --border:    #1E2A42;
-  --border-l:  #2A3A58;
-  --primary:   #3B82F6;
-  --primary-d: #2563EB;
-  --primary-g: rgba(59,130,246,.15);
-  --accent:    #F59E0B;
-  --success:   #10B981;
-  --danger:    #EF4444;
-  --warning:   #F59E0B;
-  --text:      #F1F5F9;
-  --text-s:    #94A3B8;
-  --text-d:    #64748B;
-  --text-f:    #475569;
-  --r:         16px;
-  --r-sm:      12px;
-  --r-xs:      8px;
-  --fd:        'Outfit', sans-serif;
-  --fb:        'Plus Jakarta Sans', sans-serif;
-  --max:       520px;
-  --shadow:    0 4px 30px rgba(0,0,0,.4);
-  --shadow-lg: 0 12px 48px rgba(0,0,0,.5);
+:root{
+  --bg:#06080F;--bg2:#0C1120;--surface:#111827;--card:#161E2E;--card-h:#1C2640;
+  --border:#1E2A42;--border-l:#2A3A58;--primary:#3B82F6;--primary-d:#2563EB;
+  --primary-g:rgba(59,130,246,.15);--accent:#F59E0B;--success:#10B981;
+  --danger:#EF4444;--warning:#F59E0B;--text:#F1F5F9;--text-s:#94A3B8;
+  --text-d:#64748B;--text-f:#475569;--r:16px;--r-sm:12px;--r-xs:8px;
+  --fd:'Outfit',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;--max:520px;
+  --shadow:0 4px 30px rgba(0,0,0,.4);--shadow-lg:0 12px 48px rgba(0,0,0,.5);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hidden;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
-.screen{display:none;flex-direction:column;min-height:100vh;min-height:100dvh;max-width:var(--max);margin:0 auto;animation:fadeIn .3s ease}
+/* ── SCREENS ── */
+.screen{display:none;flex-direction:column;height:100dvh;max-width:var(--max);margin:0 auto}
 .screen.active{display:flex}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes glow{0%,100%{box-shadow:0 0 8px rgba(59,130,246,.4)}50%{box-shadow:0 0 20px rgba(59,130,246,.7)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
 
-/* ══ HEADER ══ */
-.header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:90;backdrop-filter:blur(12px)}
-.header-title{font-family:var(--fd);font-size:17px;font-weight:700}
+/* ── HEADER ── */
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.header-title{font-family:var(--fd);font-size:16px;font-weight:700}
 .header-left{display:flex;align-items:center;gap:10px}
-.btn-back{background:none;border:none;color:var(--text-s);cursor:pointer;padding:6px;display:flex;border-radius:8px;transition:background .2s}
-.btn-back:hover{background:var(--card)}
+.btn-back{background:none;border:none;color:var(--text-s);cursor:pointer;padding:6px;display:flex;border-radius:8px}
 
-/* ══ CONTENT ══ */
-.content{padding:16px 18px 100px;display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto}
+/* ── SCROLL CONTENT ── */
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.content.with-bar{padding-bottom:160px}
 
-/* ══ BOTONES ══ */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:var(--fb);font-weight:600;border-radius:var(--r-sm);transition:all .2s;padding:12px 20px;font-size:14px}
-.btn:active{transform:scale(.97)}
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:var(--fb);font-weight:700;border-radius:var(--r-sm);transition:all .15s;padding:13px 20px;font-size:14px;letter-spacing:.2px;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.96);opacity:.9}
 .btn:disabled{opacity:.4;pointer-events:none}
-.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;box-shadow:0 4px 16px rgba(59,130,246,.3)}
-.btn-success{background:linear-gradient(135deg,var(--success),#059669);color:#fff;box-shadow:0 4px 16px rgba(16,185,129,.3)}
-.btn-danger{background:rgba(239,68,68,.12);color:var(--danger);border:1.5px solid rgba(239,68,68,.25)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;box-shadow:0 4px 16px rgba(59,130,246,.35)}
+.btn-success{background:linear-gradient(135deg,var(--success),#059669);color:#fff;box-shadow:0 4px 16px rgba(16,185,129,.35)}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--danger);border:1.5px solid rgba(239,68,68,.3)}
 .btn-ghost{background:transparent;color:var(--text-s);border:1.5px solid var(--border-l)}
-.btn-outline{background:transparent;color:var(--text-s);border:1.5px solid var(--border-l)}
-.btn-sm{padding:8px 14px;font-size:12px}
-.btn-lg{padding:15px 24px;font-size:16px;border-radius:var(--r)}
+.btn-sm{padding:8px 14px;font-size:12px;border-radius:var(--r-xs)}
+.btn-lg{padding:16px 24px;font-size:16px;border-radius:var(--r)}
 .btn-block{width:100%}
-.btn-icon{width:42px;height:42px;padding:0;border-radius:var(--r-sm);background:var(--card);border:1px solid var(--border);color:var(--text-s);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative}
-.btn-icon:hover{background:var(--card-h)}
+.btn-icon{width:40px;height:40px;padding:0;border-radius:var(--r-sm);background:var(--card);border:1px solid var(--border);color:var(--text-s);cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
 
-/* ══ FIELDS ══ */
+/* ── FIELDS ── */
 .field{display:flex;flex-direction:column;gap:5px}
-.field-label{font-size:11px;font-weight:700;color:var(--text-d);letter-spacing:.5px;text-transform:uppercase}
-.req{color:var(--danger)}
+.lbl{font-size:11px;font-weight:700;color:var(--text-d);letter-spacing:.5px;text-transform:uppercase}
 .input,.textarea,.select{width:100%;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:15px;font-family:var(--fb);outline:none;transition:border-color .2s}
 .input:focus,.textarea:focus,.select:focus{border-color:var(--primary)}
 .input::placeholder,.textarea::placeholder{color:var(--text-f)}
-.input:disabled,.textarea:disabled{opacity:.45;cursor:not-allowed;background:var(--card)}
-.textarea{resize:vertical;min-height:76px}
+.input:disabled,.textarea:disabled{opacity:.4;cursor:not-allowed;background:var(--card)}
+.textarea{resize:vertical;min-height:72px;line-height:1.5}
 .select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;color-scheme:dark}
 .input-wrap{position:relative}
 .money-pre{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-d);font-weight:700;pointer-events:none}
 .input-money{padding-left:30px}
 
-/* ══ CARDS ══ */
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:all .2s}
-.card-click{cursor:pointer}
-.card-click:hover{background:var(--card-h);border-color:var(--border-l)}
-.card-click:active{transform:scale(.985)}
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.card-click{cursor:pointer;transition:all .15s}
+.card-click:active{transform:scale(.985);background:var(--card-h)}
 
-/* ══ BADGES ══ */
+/* ── BADGES ── */
 .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:700}
-.badge-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .b-pendiente{background:rgba(245,158,11,.12);color:#F59E0B}
 .b-en_analisis{background:rgba(139,92,246,.12);color:#A78BFA}
 .b-aprobado{background:rgba(59,130,246,.12);color:#60A5FA}
@@ -109,137 +85,138 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .b-verificado{background:rgba(16,185,129,.12);color:#34D399}
 .b-rechazado{background:rgba(239,68,68,.12);color:#F87171}
 .b-cancelado{background:rgba(107,114,128,.12);color:#9CA3AF}
-
+.tipo-badge{font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;letter-spacing:.4px;display:inline-block}
 .tipo-Nuevo{background:rgba(139,92,246,.15);color:#A78BFA}
 .tipo-Reingreso{background:rgba(6,182,212,.15);color:#22D3EE}
 .tipo-Refinanciamiento{background:rgba(245,158,11,.15);color:#FBBF24}
-.tipo-badge{font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;letter-spacing:.4px}
 
-/* ══ CHECK ITEMS ══ */
-.check-item{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;transition:all .2s;user-select:none}
-.check-item:hover{border-color:var(--border-l)}
-.check-item.checked{background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.3)}
-.check-item.disabled{opacity:.45;cursor:default;pointer-events:none}
-.check-box{width:26px;height:26px;border-radius:8px;border:2.5px solid var(--text-f);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
-.check-item.checked .check-box{background:var(--success);border-color:var(--success)}
-.check-label{font-size:14px;font-weight:500}
-.check-item.checked .check-label{color:var(--success)}
+/* ── CHECK ITEMS ── */
+.check-item{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;transition:all .15s;user-select:none}
+.check-item:active{transform:scale(.98)}
+.check-item.checked{background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.35)}
+.check-item.disabled{opacity:.4;cursor:default;pointer-events:none}
+.chk-box{width:26px;height:26px;border-radius:8px;border:2.5px solid var(--text-f);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;color:#fff}
+.check-item.checked .chk-box{background:var(--success);border-color:var(--success)}
+.chk-label{font-size:14px;font-weight:500;flex:1}
+.check-item.checked .chk-label{color:var(--success)}
 
-/* ══ PROGRESS ══ */
-.progress-bar{width:100%;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
-.progress-fill{height:100%;border-radius:3px;transition:width .4s ease}
+/* ── PROGRESS ── */
+.prog-bar{width:100%;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .4s ease}
 
-/* ══ GPS CARD ══ */
-.gps-card{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm)}
-.gps-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.gps-ok{background:rgba(16,185,129,.12);color:var(--success)}
-.gps-empty{background:rgba(59,130,246,.12);color:var(--primary)}
-.gps-link{font-size:12px;color:var(--primary);text-decoration:none}
-.gps-link:hover{text-decoration:underline}
+/* ── GPS ── */
+.gps-cap{display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(16,185,129,.06);border:1.5px solid rgba(16,185,129,.3);border-radius:var(--r-sm)}
+.gps-empty-cap{display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--bg);border:1.5px dashed var(--border-l);border-radius:var(--r-sm);color:var(--text-d);font-size:13px}
 
-/* ══ STEPPER ══ */
-.stepper{display:flex;flex-direction:column;gap:0}
-.step{display:flex;align-items:center;gap:12px;padding:10px 0;position:relative}
-.step-line{position:absolute;left:16px;top:40px;bottom:-10px;width:2.5px;background:var(--border);z-index:1}
-.step:last-child .step-line{display:none}
-.step-circle{width:32px;height:32px;border-radius:50%;border:2.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:2;position:relative;background:var(--bg);transition:all .3s}
-.step.done .step-circle{border-color:var(--success);background:var(--success)}
-.step.done .step-line{background:var(--success)}
-.step.current .step-circle{border-color:var(--primary);background:var(--primary);animation:glow 2s infinite}
-.step.current .step-line{background:linear-gradient(to bottom,var(--primary),var(--border))}
-.step-info{flex:1}
-.step-label{font-size:14px;font-weight:600;color:var(--text-d)}
-.step.done .step-label{color:var(--success)}
-.step.current .step-label{color:var(--text);font-weight:700;font-size:15px}
-.step-meta{font-size:11px;color:var(--text-f);margin-top:2px}
+/* ── SLA TIMER ── */
+.sla-v{background:rgba(16,185,129,.1);color:#10B981}
+.sla-a{background:rgba(245,158,11,.1);color:#F59E0B}
+.sla-r{background:rgba(239,68,68,.1);color:#EF4444;animation:pulse 2s infinite}
+.timer-chip{padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700}
 
-/* ══ ACTION BAR ══ */
-.action-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--max);padding:14px 18px;background:var(--surface);border-top:1px solid var(--border);backdrop-filter:blur(16px);z-index:80;display:none}
-.action-bar.show{display:block}
-.action-bar-main{display:flex;align-items:center;gap:10px;width:100%;border:none;cursor:pointer;font-family:var(--fb);font-weight:700;border-radius:var(--r-sm);padding:16px;font-size:16px;justify-content:center;gap:10px;transition:all .2s}
-.action-bar-main:active{transform:scale(.97)}
-.bar-iniciar{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;box-shadow:0 4px 24px rgba(59,130,246,.45)}
-.bar-aprobar{background:linear-gradient(135deg,var(--success),#059669);color:#fff;box-shadow:0 4px 24px rgba(16,185,129,.4)}
-.bar-rechazar{background:rgba(239,68,68,.12);color:var(--danger);border:2px solid rgba(239,68,68,.3)}
-.action-bar-sub{display:flex;gap:10px;margin-top:10px}
+/* ── PUNTOS LISTA ── */
+.punto-item{display:flex;align-items:center;gap:10px;padding:12px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);transition:border-color .2s}
+.punto-num{width:28px;height:28px;border-radius:50%;background:var(--primary-g);border:1.5px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--primary);flex-shrink:0}
+.punto-info{flex:1;min-width:0}
+.punto-nombre{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.punto-dist{font-size:11px;color:var(--text-d);margin-top:2px}
+.punto-actions{display:flex;gap:6px;flex-shrink:0}
+.btn-mini{width:30px;height:30px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text-s);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s}
+.btn-mini:active{transform:scale(.9)}
+.punto-done{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.04)}
+.punto-done .punto-num{background:rgba(16,185,129,.15);border-color:var(--success);color:var(--success)}
 
-/* ══ STATS ══ */
+/* ── STATS ── */
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 8px;text-align:center}
 .stat-val{font-family:var(--fd);font-size:22px;font-weight:800}
 .stat-lbl{font-size:10px;color:var(--text-d);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:3px}
 
-/* ══ SECTION TITLE ══ */
-.sec-title{font-size:11px;font-weight:700;color:var(--text-d);letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px}
+/* ── SEC TITLE ── */
+.sec{font-size:11px;font-weight:700;color:var(--text-d);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px}
 
-/* ══ TIMELINE ══ */
-.tl{display:flex;flex-direction:column;gap:0}
-.tl-item{display:flex;gap:12px;padding:9px 0}
-.tl-dot-w{display:flex;flex-direction:column;align-items:center}
-.tl-dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex-shrink:0}
-.tl-line{width:1.5px;flex:1;background:var(--border);margin-top:4px}
-.tl-text{font-size:13px;font-weight:500}
+/* ── TIMELINE ── */
+.tl{display:flex;flex-direction:column}
+.tl-item{display:flex;gap:11px;padding:9px 0}
+.tl-dw{display:flex;flex-direction:column;align-items:center}
+.tl-dot{width:10px;height:10px;border-radius:50%;margin-top:3px;flex-shrink:0}
+.tl-ln{width:1.5px;flex:1;background:var(--border);margin-top:4px}
+.tl-txt{font-size:13px;font-weight:500}
 .tl-meta{font-size:11px;color:var(--text-d);margin-top:2px}
 
-/* ══ TIMER ══ */
-.timer-card{border-radius:var(--r);padding:18px;text-align:center}
-.timer-val{font-family:var(--fd);font-size:40px;font-weight:900;line-height:1}
+/* ── ACTION BAR (FIXED BOTTOM) ── */
+.action-bar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:var(--max);
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:12px 16px 20px;
+  display:none;flex-direction:column;gap:8px;
+  z-index:200;
+  box-shadow:0 -8px 32px rgba(0,0,0,.5);
+}
+.action-bar.show{display:flex}
+.bar-main{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;border:none;cursor:pointer;font-family:var(--fd);font-weight:800;border-radius:var(--r);font-size:16px;letter-spacing:.3px;transition:all .15s;width:100%}
+.bar-main:active{transform:scale(.97)}
+.bar-iniciar{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;box-shadow:0 4px 24px rgba(59,130,246,.5)}
+.bar-aprobar{background:linear-gradient(135deg,var(--success),#059669);color:#fff;box-shadow:0 4px 24px rgba(16,185,129,.45)}
+.bar-sub{display:flex;gap:8px}
+.bar-sub .btn{flex:1;padding:13px}
 
-/* ══ TOAST ══ */
-.toast-wrap{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:calc(var(--max) - 32px);width:calc(100% - 32px);pointer-events:none}
-.toast{padding:13px 18px;border-radius:var(--r-sm);font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;animation:slideDown .3s ease;pointer-events:auto;box-shadow:var(--shadow-lg);backdrop-filter:blur(16px)}
-.toast-success{background:rgba(16,185,129,.95);color:#fff}
-.toast-error{background:rgba(239,68,68,.95);color:#fff}
-.toast-info{background:rgba(59,130,246,.95);color:#fff}
-.toast-warning{background:rgba(245,158,11,.95);color:#fff}
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--max);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0 14px;cursor:pointer;border:none;background:none;font-family:var(--fb);color:var(--text-d);font-size:10px;font-weight:600;gap:4px;transition:color .2s}
+.bnav-item.active{color:var(--primary)}
 
-/* ══ MODAL CONFIRM ══ */
-.modal-over{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-over.open{display:flex}
-.modal-box{background:var(--surface);border:1px solid var(--border-l);border-radius:var(--r);padding:26px 22px;max-width:340px;width:100%;animation:fadeIn .25s ease;text-align:center}
-.modal-box-title{font-family:var(--fd);font-size:18px;font-weight:700;margin-bottom:8px}
-.modal-box-text{font-size:14px;color:var(--text-s);margin-bottom:22px;line-height:1.6}
-.modal-box-btns{display:flex;gap:10px}
-.modal-box-btns .btn{flex:1}
+/* ── TOAST ── */
+.toast-w{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:calc(var(--max) - 32px);width:calc(100% - 32px);pointer-events:none}
+.toast{padding:13px 16px;border-radius:var(--r-sm);font-size:14px;font-weight:600;display:flex;align-items:center;gap:9px;animation:slideDown .3s ease;box-shadow:var(--shadow-lg);pointer-events:auto}
+@keyframes slideDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+.toast-success{background:rgba(16,185,129,.96);color:#fff}
+.toast-error{background:rgba(239,68,68,.96);color:#fff}
+.toast-info{background:rgba(59,130,246,.96);color:#fff}
+.toast-warning{background:rgba(245,158,11,.96);color:#fff}
 
-/* ══ NOTIF DOT ══ */
-.notif-dot{position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:var(--danger);border:2px solid var(--card);animation:pulse 2s infinite}
+/* ── BOTTOM SHEET (para notas/confirmación) ── */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;backdrop-filter:blur(4px)}
+.sheet-bg.open{display:block}
+.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--max);background:var(--surface);border-radius:var(--r) var(--r) 0 0;border:1px solid var(--border-l);border-bottom:none;z-index:501;padding:20px 18px 32px;display:none;flex-direction:column;gap:14px;animation:slideUp .3s ease}
+.sheet.open{display:flex}
+.sheet-handle{width:40px;height:4px;background:var(--border-l);border-radius:2px;margin:0 auto -6px}
+.sheet-title{font-family:var(--fd);font-size:17px;font-weight:700}
 
-/* ══ LOGIN ══ */
-.login-wrap{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;padding:24px}
+/* ── LOGIN ── */
+.login-w{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;padding:24px}
 .login-box{width:100%;max-width:340px;display:flex;flex-direction:column;gap:20px;align-items:center}
-.login-logo{width:80px;height:80px;border-radius:26px;background:linear-gradient(135deg,var(--primary),#7C3AED);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(59,130,246,.35)}
-.login-title{font-family:var(--fd);font-size:32px;font-weight:900;background:linear-gradient(135deg,var(--text),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.login-sub{font-size:13px;color:var(--text-d);margin-top:-12px;text-align:center}
+.login-logo{width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,var(--primary),#7C3AED);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(59,130,246,.35)}
+.login-title{font-family:var(--fd);font-size:30px;font-weight:900;background:linear-gradient(135deg,var(--text),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.login-sub{font-size:13px;color:var(--text-d);margin-top:-14px;text-align:center}
 .login-form{width:100%;display:flex;flex-direction:column;gap:14px}
-.login-err{padding:10px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:var(--r-sm);font-size:13px;color:var(--danger);display:none;width:100%}
+.login-err{padding:10px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:var(--r-sm);font-size:13px;color:var(--danger);display:none}
 .login-err.show{display:block}
 
-/* ══ EMPTY ══ */
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 24px;text-align:center;opacity:.7}
-.empty-icon{margin-bottom:14px;opacity:.35;color:var(--text-d)}
-.empty-title{font-size:15px;font-weight:600;margin-bottom:6px}
-.empty-sub{font-size:13px;color:var(--text-d)}
+/* ── EMPTY STATE ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;opacity:.7}
+.empty-icon{opacity:.3;margin-bottom:14px;color:var(--text-d)}
+.empty-title{font-size:15px;font-weight:600;color:var(--text-d);margin-bottom:6px}
+.empty-sub{font-size:12px;color:var(--text-f)}
 
-/* ══ BOTTOM NAV ══ */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--max);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:80;backdrop-filter:blur(12px)}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0 12px;cursor:pointer;transition:all .2s;border:none;background:none;font-family:var(--fb);color:var(--text-d);font-size:10px;font-weight:600;gap:4px;position:relative}
-.nav-item.active{color:var(--primary)}
-.nav-item:hover{color:var(--text-s)}
-.info-row{display:flex;align-items:center;justify-content:space-between}
-.info-label{font-size:11px;color:var(--text-f);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-.info-value{font-size:14px;font-weight:600}
-.info-monto{font-family:var(--fd);font-size:18px;font-weight:800;color:var(--accent)}
-.sla-verde{background:rgba(16,185,129,.1);color:var(--success)}
-.sla-amarillo{background:rgba(245,158,11,.1);color:var(--warning)}
-.sla-rojo{background:rgba(239,68,68,.1);color:var(--danger);animation:pulse 2s infinite}
-.timer-chip{padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700}
+/* ── GPS STATUS BAR ── */
+.gps-bar{display:flex;align-items:center;gap:8px;padding:9px 13px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-weight:600}
+.gps-pulse{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.gps-active{background:var(--success);animation:pulse 2s infinite}
+.gps-inactive{background:var(--text-f)}
+
+/* ── MAPA PUNTOS ── */
+#mapaPuntos{height:220px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border);flex-shrink:0}
+
+/* NOTIF DOT */
+.notif-dot{position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:var(--danger);border:2px solid var(--card)}
 </style>
 </head>
 <body>
 
-<!-- ══ LOGIN ══ -->
-<div class="login-wrap" id="loginWrap">
+<!-- LOGIN -->
+<div class="login-w" id="loginWrap">
   <div class="login-box">
     <div class="login-logo">
       <svg width="40" height="40" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
@@ -248,15 +225,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="login-sub">App del Verificador</div>
     <div class="login-err" id="loginErr"></div>
     <div class="login-form">
-      <div class="field">
-        <label class="field-label">Usuario</label>
-        <input class="input" id="loginUser" placeholder="Tu usuario" autocomplete="username">
+      <div class="field"><label class="lbl">Usuario</label>
+        <input class="input" id="lu" placeholder="Tu usuario" autocomplete="username" inputmode="email">
       </div>
-      <div class="field">
-        <label class="field-label">Contraseña</label>
-        <input class="input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+      <div class="field"><label class="lbl">Contraseña</label>
+        <input class="input" id="lp" type="password" placeholder="••••••••" autocomplete="current-password">
       </div>
-      <button class="btn btn-primary btn-lg btn-block" id="loginBtn" onclick="doLogin()" style="margin-top:4px">
+      <button class="btn btn-primary btn-lg btn-block" id="loginBtn" onclick="doLogin()">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
         Ingresar
       </button>
@@ -265,110 +240,102 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 </div>
 
-<!-- ══ SCREENS ══ -->
-
-<!-- DASHBOARD VERIFICADOR -->
-<div class="screen" id="scrDash">
+<!-- ══ SCREEN: DASHBOARD ══ -->
+<div class="screen" id="sDash">
   <div class="header">
     <div class="header-left">
-      <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),#7C3AED);display:flex;align-items:center;justify-content:center">
-        <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+      <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--primary),#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
       </div>
       <div>
-        <div class="header-title" id="dashGreeting">Buen día</div>
-        <div style="font-size:11px;color:var(--text-d)" id="dashDate"></div>
+        <div class="header-title" id="dGreet">Bienvenido</div>
+        <div style="font-size:11px;color:var(--text-d)" id="dDate"></div>
       </div>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn-icon" id="notifBtn" onclick="showScreen('scrNotif')" title="Notificaciones">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <button class="btn-icon" id="notifBtn" onclick="goScreen('sNotif')">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
         <div class="notif-dot" id="notifDot" style="display:none"></div>
       </button>
       <button class="btn-icon" onclick="doLogout()">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       </button>
     </div>
   </div>
-
-  <div class="content" id="dashContent">
-    <!-- GPS STATUS -->
-    <div id="gpsStatus" class="card" style="border-color:var(--primary)30">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:13px;font-weight:600;color:var(--text-s)">
-          <span id="gpsStatusIcon">📍</span> <span id="gpsStatusText">Activando GPS...</span>
-        </div>
-        <button class="btn btn-ghost btn-sm" onclick="forzarGPS()">Actualizar</button>
-      </div>
+  <div class="content" style="padding-bottom:80px" id="dashContent">
+    <!-- GPS bar -->
+    <div class="gps-bar" id="gpsBar">
+      <div class="gps-pulse gps-inactive" id="gpsPulse"></div>
+      <span id="gpsBarTxt" style="flex:1">Activando GPS...</span>
+      <button class="btn btn-ghost btn-sm" onclick="forzarGPS()" style="padding:5px 10px">↺</button>
     </div>
-
-    <!-- STATS HOY -->
+    <!-- Stats -->
     <div class="stats-row" id="dashStats">
-      <div class="stat-box"><div class="stat-val" id="stTotal">0</div><div class="stat-lbl">Asignadas</div></div>
-      <div class="stat-box"><div class="stat-val" style="color:var(--success)" id="stVerif">0</div><div class="stat-lbl">Verificadas</div></div>
-      <div class="stat-box"><div class="stat-val" style="color:var(--primary)" id="stActiva">0</div><div class="stat-lbl">Activas</div></div>
+      <div class="stat-box"><div class="stat-val" id="stPend">0</div><div class="stat-lbl">Pendientes</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--primary)" id="stAct">0</div><div class="stat-lbl">En campo</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--success)" id="stDone">0</div><div class="stat-lbl">Completadas</div></div>
     </div>
-
-    <!-- LISTA SOLICITUDES -->
-    <div id="dashSolicitudes"></div>
+    <!-- Lista solicitudes -->
+    <div id="dashList"></div>
   </div>
-
-  <nav class="bottom-nav">
-    <button class="nav-item active" onclick="showScreen('scrDash')">
+  <nav class="bnav">
+    <button class="bnav-item active" onclick="goScreen('sDash')">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Inicio
     </button>
-    <button class="nav-item" onclick="showScreen('scrHistorial')">
+    <button class="bnav-item" onclick="goScreen('sHist')">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
       Historial
     </button>
   </nav>
 </div>
 
-<!-- DETALLE SOLICITUD -->
-<div class="screen" id="scrDetalle">
+<!-- ══ SCREEN: DETALLE SOLICITUD ══ -->
+<div class="screen" id="sDet">
   <div class="header">
     <div class="header-left">
-      <button class="btn-back" onclick="volverDash()">
+      <button class="btn-back" onclick="goScreen('sDash')">
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       </button>
       <div>
-        <div class="header-title" id="detTitle">—</div>
-        <div id="detBadgeHead" style="margin-top:2px"></div>
+        <div class="header-title" id="detTit">—</div>
+        <div id="detBadge" style="margin-top:2px"></div>
       </div>
     </div>
   </div>
-  <div class="content" id="detContent"></div>
-  <div class="action-bar" id="detActionBar"></div>
+  <div class="content with-bar" id="detContent"></div>
+  <!-- ACTION BAR fija -->
+  <div class="action-bar" id="detBar"></div>
 </div>
 
-<!-- HISTORIAL -->
-<div class="screen" id="scrHistorial">
+<!-- ══ SCREEN: HISTORIAL ══ -->
+<div class="screen" id="sHist">
   <div class="header">
     <div class="header-left">
-      <button class="btn-back" onclick="showScreen('scrDash')">
+      <button class="btn-back" onclick="goScreen('sDash')">
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       </button>
       <div class="header-title">Mis verificaciones</div>
     </div>
   </div>
-  <div class="content" id="histContent"></div>
-  <nav class="bottom-nav">
-    <button class="nav-item" onclick="showScreen('scrDash')">
+  <div class="content" style="padding-bottom:80px" id="histContent"></div>
+  <nav class="bnav">
+    <button class="bnav-item" onclick="goScreen('sDash')">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Inicio
     </button>
-    <button class="nav-item active" onclick="showScreen('scrHistorial')">
+    <button class="bnav-item active" onclick="goScreen('sHist')">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
       Historial
     </button>
   </nav>
 </div>
 
-<!-- NOTIFICACIONES -->
-<div class="screen" id="scrNotif">
+<!-- ══ SCREEN: NOTIFICACIONES ══ -->
+<div class="screen" id="sNotif">
   <div class="header">
     <div class="header-left">
-      <button class="btn-back" onclick="showScreen('scrDash')">
+      <button class="btn-back" onclick="goScreen('sDash')">
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       </button>
       <div class="header-title">Notificaciones</div>
@@ -378,139 +345,134 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="content" id="notifContent"></div>
 </div>
 
-<!-- MODAL CONFIRMACIÓN -->
-<div class="modal-over" id="modalConfirm">
-  <div class="modal-box">
-    <div class="modal-box-title" id="confirmTitle">¿Confirmar?</div>
-    <div class="modal-box-text" id="confirmText"></div>
-    <div style="margin-bottom:16px" id="confirmNota" style="display:none">
-      <textarea class="textarea" id="confirmNotaInput" placeholder="Notas u observaciones (requerido)..." style="min-height:64px"></textarea>
-    </div>
-    <div class="modal-box-btns">
-      <button class="btn btn-ghost" onclick="closeConfirm()">Cancelar</button>
-      <button class="btn btn-primary" id="confirmOkBtn">Confirmar</button>
-    </div>
+<!-- ══ BOTTOM SHEET (notas / confirmación) ══ -->
+<div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="sheetTitle">Confirmar acción</div>
+  <div id="sheetBody" style="color:var(--text-s);font-size:14px;line-height:1.6"></div>
+  <div class="field">
+    <label class="lbl">Notas / Observaciones <span style="color:var(--danger)">*</span></label>
+    <textarea class="textarea" id="sheetNota" placeholder="Describe lo que encontraste..." style="min-height:90px"></textarea>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button class="btn btn-ghost" style="flex:1" onclick="closeSheet()">Cancelar</button>
+    <button class="btn btn-primary" style="flex:1" id="sheetOkBtn">Confirmar</button>
   </div>
 </div>
 
 <!-- TOAST -->
-<div class="toast-wrap" id="toastWrap"></div>
+<div class="toast-w" id="toastW"></div>
 
 <script>
-// ══════════════════════════════════════════
-//  CONFIG — REEMPLAZAR CON TUS DATOS DE SUPABASE
-// ══════════════════════════════════════════
-const SUPABASE_URL  = 'https://smaqcarchvtniimryxyr.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtYXFjYXJjaHZ0bmlpbXJ5eHlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNjA5MjEsImV4cCI6MjA5NzgzNjkyMX0.7ZGSYlKKnJFtAPBf7t7eXsiMdcMz9Z67U5LZxcLgzEU';
+// ══════════════════════════════
+//  CONFIG — REEMPLAZAR CON TUS CLAVES
+// ══════════════════════════════
+const SUPABASE_URL  = 'https://TU_PROYECTO.supabase.co';
+const SUPABASE_ANON = 'TU_ANON_KEY';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-let SESSION = null;
-let SOLIS   = [];        // solicitudes activas asignadas al verificador
-let detSolId = null;     // solicitud abierta
+// ── ESTADO GLOBAL ──────────────
+let SES   = null;   // session
+let SOLIS = [];     // solicitudes cargadas
+let detId = null;   // solicitud abierta
+let checkState = {};
+let puntos = [];    // puntos de verificación de la solicitud actual
+let mapaP = null;   // leaflet instance para puntos
+let mapaMarkers = [];
+let gpsWatchId = null;
 let gpsInterval = null;
+let gpsHistInterval = null;
 let timerInterval = null;
 let realtimeChan = null;
-let confirmCb = null;
+let sheetCb = null;
+let lastPos = null; // {lat,lng}
 
-// Docs de verificación que el verificador confirma
-const VERIF_DOCS = [
-  {key:'identidad_trabajo', label:'Identidad verificada en trabajo'},
-  {key:'foto_trabajo',      label:'Foto del lugar de trabajo'},
-  {key:'coordenadas_trabajo',label:'Coordenadas de trabajo capturadas'},
-  {key:'identidad_domicilio',label:'Identidad verificada en domicilio'},
-  {key:'foto_domicilio',    label:'Foto del domicilio'},
-  {key:'coordenadas_domicilio',label:'Coordenadas de domicilio capturadas'},
-  {key:'vecinos_confirmaron',label:'Vecinos confirmaron datos'},
-  {key:'referencias_ok',   label:'Referencias contactadas'},
-];
+const CHKSV = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
 
-let checkState = {}; // key -> boolean para la solicitud actual
-
-// ══ HELPERS ═══════════════════════════
+// ── HELPERS ────────────────────
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const fmtMoney = n => 'L. '+Number(n||0).toLocaleString('es-HN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtM = n => 'L. '+Number(n||0).toLocaleString('es-HN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtDt = iso => {if(!iso)return'—';const d=new Date(iso);return d.toLocaleDateString('es-HN',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('es-HN',{hour:'2-digit',minute:'2-digit'})};
-const fmtDur = seg => {if(!seg&&seg!==0)return'—';const h=Math.floor(seg/3600),m=Math.floor((seg%3600)/60),s=Math.floor(seg%60);return h>0?`${h}h ${m}m`:`${m}m ${s}s`};
+const fmtDur = s => {if(!s&&s!==0)return'—';const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=Math.floor(s%60);return h>0?`${h}h ${m}m`:`${m}m ${ss}s`};
+const fmtKm = m => m<1000?`${Math.round(m)}m`:`${(m/1000).toFixed(1)}km`;
 const now = () => new Date().toISOString();
-const slaClass = segs => segs<7200?'sla-verde':segs<14400?'sla-amarillo':'sla-rojo';
+const slaC = s => s<7200?'sla-v':s<14400?'sla-a':'sla-r';
 
-function toast(msg,type='info'){
-  const w=document.getElementById('toastWrap');
+function toast(msg, type='info'){
+  const w=document.getElementById('toastW');
   const t=document.createElement('div');
   t.className=`toast toast-${type}`;
-  t.innerHTML=`<span>${{success:'✓',error:'✕',info:'ℹ',warning:'⚠'}[type]||'ℹ'}</span>${esc(msg)}`;
-  w.appendChild(t);setTimeout(()=>t.remove(),3500);
+  t.innerHTML=`<span>${{success:'✓',error:'✕',info:'ℹ',warning:'⚠'}[type]}</span>${esc(msg)}`;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
 }
 
-const checkSvg = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+function badgeHtml(e){
+  const L={pendiente:'Pendiente',en_analisis:'En análisis',aprobado:'Aprobado',en_verificacion:'En campo',verificado:'Verificado',rechazado:'Rechazado',cancelado:'Cancelado'};
+  return`<span class="badge b-${e}">${L[e]||e}</span>`;
+}
 
-// ══ SCREENS ══════════════════════════
-function showScreen(id){
+// ── SCREENS ───────────────────
+function goScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if(id==='scrHistorial')renderHistorial();
-  if(id==='scrNotif')renderNotif();
+  if(id==='sHist') renderHist();
+  if(id==='sNotif') renderNotif();
 }
 
-// ══ LOGIN ════════════════════════════
-document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+// ── LOGIN ──────────────────────
+document.getElementById('lp').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
 
 async function doLogin(){
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value;
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value;
   const err=document.getElementById('loginErr');
   const btn=document.getElementById('loginBtn');
   err.classList.remove('show');
   if(!u||!p){err.textContent='Ingresa usuario y contraseña';err.classList.add('show');return;}
-  btn.disabled=true;btn.textContent='Verificando...';
+  btn.disabled=true; btn.textContent='Verificando...';
   try{
     const {data,error}=await db.rpc('login_usuario',{p_usuario:u,p_password:p});
-    if(error||!data||!data.length){
-      err.textContent='Usuario o contraseña incorrectos';err.classList.add('show');
-    } else {
+    if(error||!data?.length){err.textContent='Usuario o contraseña incorrectos';err.classList.add('show');}
+    else{
       const user=data[0];
-      if(user.rol!=='verificador'&&user.rol!=='admin'){err.textContent='Esta app es solo para verificadores';err.classList.add('show');return;}
-      if(!user.activo){err.textContent='Tu cuenta está desactivada';err.classList.add('show');return;}
-      SESSION={id:user.id,nombre:user.nombre,usuario:user.usuario,rol:user.rol};
-      localStorage.setItem('vc_verif_session',JSON.stringify(SESSION));
+      if(!['verificador','admin'].includes(user.rol)){err.textContent='Esta app es solo para verificadores';err.classList.add('show');return;}
+      if(!user.activo){err.textContent='Cuenta desactivada';err.classList.add('show');return;}
+      SES={id:user.id,nombre:user.nombre,usuario:user.usuario,rol:user.rol};
+      localStorage.setItem('vc_v2',JSON.stringify(SES));
       initApp();
     }
-  } catch(e){
-    err.textContent='Error de conexión';err.classList.add('show');console.error(e);
-  } finally{btn.disabled=false;btn.textContent='Ingresar';}
+  }catch(e){err.textContent='Error de conexión';err.classList.add('show');console.error(e);}
+  finally{btn.disabled=false;btn.textContent='Ingresar';}
 }
 
-function doLogout(){
-  SESSION=null;
-  localStorage.removeItem('vc_verif_session');
-  if(realtimeChan)db.removeChannel(realtimeChan);
-  if(gpsInterval)clearInterval(gpsInterval);
-  if(timerInterval)clearInterval(timerInterval);
-  // Marcar inactivo en BD
-  db.from('ubicaciones_verificadores').upsert({verificador_id:SESSION?.id||'',activo:false,updated_at:now()}).then(()=>{});
+async function doLogout(){
+  if(SES) await db.from('ubicaciones_verificadores').upsert({verificador_id:SES.id,nombre:SES.nombre,activo:false,updated_at:now()},{onConflict:'verificador_id'});
+  SES=null; localStorage.removeItem('vc_v2');
+  if(realtimeChan) db.removeChannel(realtimeChan);
+  if(gpsInterval) clearInterval(gpsInterval);
+  if(gpsHistInterval) clearInterval(gpsHistInterval);
+  if(timerInterval) clearInterval(timerInterval);
+  if(gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
   document.getElementById('loginWrap').style.display='flex';
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  goScreen('sDash');
 }
 
 function restoreSession(){
-  const s=localStorage.getItem('vc_verif_session');
-  if(s)try{SESSION=JSON.parse(s);initApp();}catch(e){localStorage.removeItem('vc_verif_session');}
+  const s=localStorage.getItem('vc_v2');
+  if(s)try{SES=JSON.parse(s);initApp();}catch(e){localStorage.removeItem('vc_v2');}
 }
 
-// ══ INIT ════════════════════════════
+// ── INIT ──────────────────────
 async function initApp(){
   document.getElementById('loginWrap').style.display='none';
-  showScreen('scrDash');
-
   const hora=new Date().getHours();
-  document.getElementById('dashGreeting').textContent=
-    hora<12?`Buenos días, ${SESSION.nombre.split(' ')[0]}`
-    :hora<18?`Buenas tardes, ${SESSION.nombre.split(' ')[0]}`
-    :`Buenas noches, ${SESSION.nombre.split(' ')[0]}`;
-  document.getElementById('dashDate').textContent=new Date().toLocaleDateString('es-HN',{weekday:'long',day:'numeric',month:'long'});
-
+  document.getElementById('dGreet').textContent=(hora<12?'Buenos días, ':hora<18?'Buenas tardes, ':'Buenas noches, ')+SES.nombre.split(' ')[0];
+  document.getElementById('dDate').textContent=new Date().toLocaleDateString('es-HN',{weekday:'long',day:'numeric',month:'long'});
+  goScreen('sDash');
   await cargarSolicitudes();
   renderDash();
   iniciarGPS();
@@ -519,408 +481,590 @@ async function initApp(){
   iniciarTimers();
 }
 
-// ══ DATOS ════════════════════════════
+// ── DATOS ──────────────────────
 async function cargarSolicitudes(){
-  // Solicitudes aprobadas sin asignar O asignadas a este verificador
-  const {data,error}=await db.from('solicitudes')
-    .select('*')
-    .or(`estatus.eq.aprobado,and(verificador_id.eq.${SESSION.id},estatus.in.(en_verificacion,verificado,rechazado,cancelado))`)
+  // Aprobadas sin asignar + las mías activas o recientes
+  const hoy=new Date(); hoy.setHours(0,0,0,0);
+  const {data}=await db.from('solicitudes').select('*')
+    .or(`estatus.eq.aprobado,and(verificador_id.eq.${SES.id},estatus.in.(en_verificacion,verificado,rechazado,cancelado))`)
     .order('fecha_creacion',{ascending:false});
-  if(error){toast('Error cargando datos','error');return;}
   SOLIS=data||[];
 }
 
-// ══ DASHBOARD ════════════════════════
+// ── DASHBOARD ─────────────────
 function renderDash(){
-  const activas=SOLIS.filter(s=>['aprobado','en_verificacion'].includes(s.estatus));
-  const verif=SOLIS.filter(s=>s.estatus==='verificado'&&s.verificador_id===SESSION.id);
-  const asignadas=SOLIS.filter(s=>s.verificador_id===SESSION.id||s.estatus==='aprobado');
+  const pend=SOLIS.filter(s=>s.estatus==='aprobado');
+  const act=SOLIS.filter(s=>s.estatus==='en_verificacion'&&s.verificador_id===SES.id);
+  const done=SOLIS.filter(s=>['verificado','rechazado'].includes(s.estatus)&&s.verificador_id===SES.id);
+  document.getElementById('stPend').textContent=pend.length;
+  document.getElementById('stAct').textContent=act.length;
+  document.getElementById('stDone').textContent=done.length;
 
-  document.getElementById('stTotal').textContent=asignadas.length;
-  document.getElementById('stVerif').textContent=verif.length;
-  document.getElementById('stActiva').textContent=activas.length;
-
-  const el=document.getElementById('dashSolicitudes');
+  const activas=[...act,...pend];
+  const el=document.getElementById('dashList');
   if(!activas.length){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div><div class="empty-title">Sin pendientes</div><div class="empty-sub">Las solicitudes aprobadas aparecerán aquí</div></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-icon"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div><div class="empty-title">Sin solicitudes activas</div><div class="empty-sub">Las solicitudes aprobadas aparecerán aquí</div></div>`;
     return;
   }
-
-  const ahora=Date.now();
-  el.innerHTML=`<div class="sec-title">${activas.length} solicitud${activas.length>1?'es':''} activa${activas.length>1?'s':''}</div>`
+  const ah=Date.now();
+  el.innerHTML=`<div class="sec">${activas.length} activa${activas.length>1?'s':''}</div>`
     +activas.map(s=>{
-      const segs=Math.floor((ahora-new Date(s.fecha_creacion).getTime())/1000);
-      const sc=slaClass(segs);
-      return`<div class="card card-click" onclick="abrirDetalle('${s.id}')">
+      const segs=Math.floor((ah-new Date(s.fecha_creacion).getTime())/1000);
+      return`<div class="card card-click" onclick="abrirDet('${s.id}')">
         <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
           <div>
-            <div style="font-size:16px;font-weight:700">${esc(s.cliente)}</div>
-            <span class="tipo-badge tipo-${s.tipo}" style="margin-top:4px;display:inline-block">${s.tipo}</span>
+            <div style="font-size:16px;font-weight:700;margin-bottom:4px">${esc(s.cliente)}</div>
+            <span class="tipo-badge tipo-${s.tipo}">${s.tipo}</span>
           </div>
-          <span class="timer-chip ${sc}" data-start="${s.fecha_creacion}">${fmtDur(segs)}</span>
+          <span class="timer-chip ${slaC(segs)}" data-start="${s.fecha_creacion}">${fmtDur(segs)}</span>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--accent)">${fmtMoney(s.monto)}</div>
-          <div class="badge b-${s.estatus}"><div class="badge-dot" style="background:currentColor"></div>${s.estatus==='aprobado'?'Esperando inicio':s.estatus==='en_verificacion'?'En campo':'—'}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+          <div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--accent)">${fmtM(s.monto)}</div>
+          ${badgeHtml(s.estatus)}
         </div>
         ${s.asesor_nombre?`<div style="font-size:11px;color:var(--text-d);margin-top:6px">Asesor: ${esc(s.asesor_nombre)}</div>`:''}
       </div>`;
     }).join('');
 }
 
+// ── TIMERS EN VIVO ────────────
 function iniciarTimers(){
-  if(timerInterval)clearInterval(timerInterval);
+  if(timerInterval) clearInterval(timerInterval);
   timerInterval=setInterval(()=>{
-    const ahora=Date.now();
-    document.querySelectorAll('.timer-chip[data-start]').forEach(el=>{
-      const s=Math.floor((ahora-new Date(el.dataset.start).getTime())/1000);
+    const ah=Date.now();
+    document.querySelectorAll('[data-start]').forEach(el=>{
+      const s=Math.floor((ah-new Date(el.dataset.start).getTime())/1000);
       el.textContent=fmtDur(s);
-      el.className='timer-chip '+slaClass(s);
+      if(el.classList.contains('timer-chip')) el.className='timer-chip '+slaC(s);
     });
-    // Timer en detalle si está abierto
-    const dt=document.getElementById('liveTimer');
-    if(dt&&detSolId){
-      const sol=SOLIS.find(x=>x.id===detSolId);
-      if(sol){
-        const s=Math.floor((ahora-new Date(sol.fecha_creacion).getTime())/1000);
-        dt.textContent=fmtDur(s);
-      }
-    }
   },1000);
 }
 
-// ══ DETALLE ══════════════════════════
-async function abrirDetalle(id){
-  detSolId=id;
+// ── DETALLE ───────────────────
+async function abrirDet(id){
+  detId=id;
   let s=SOLIS.find(x=>x.id===id);
   if(!s){const r=await db.from('solicitudes').select('*').eq('id',id).single();s=r.data;}
   if(!s)return;
 
-  document.getElementById('detTitle').textContent=s.cliente;
-  document.getElementById('detBadgeHead').innerHTML=badgeHtml(s.estatus);
+  document.getElementById('detTit').textContent=s.cliente;
+  document.getElementById('detBadge').innerHTML=badgeHtml(s.estatus);
 
-  // Check state
+  puntos=s.puntos_verificacion||[];
   checkState={};
-  VERIF_DOCS.forEach(d=>{checkState[d.key]=false;});
-  if(s.checklist_verificacion)Object.assign(checkState,s.checklist_verificacion);
+  const reqAsi=s.requisitos_asignados||{};
+  Object.keys(reqAsi).forEach(k=>{if(reqAsi[k])checkState[k]=s.checklist_verificacion?.[k]||false;});
 
   const cerrado=['verificado','rechazado','cancelado'].includes(s.estatus);
-  const mio=s.verificador_id===SESSION.id||!s.verificador_id;
-  const ahora=Date.now();
-  const segs=Math.floor((ahora-new Date(s.fecha_creacion).getTime())/1000);
+  const mio=s.verificador_id===SES.id||!s.verificador_id;
+  const iniciado=s.estatus==='en_verificacion'&&s.verificador_id===SES.id;
+  const ah=Date.now();
+  const segs=Math.floor((ah-new Date(s.fecha_creacion).getTime())/1000);
 
   const hist=await db.from('historial_solicitud').select('*').eq('solicitud_id',id).order('timestamp',{ascending:false}).then(r=>r.data||[]);
 
   let h='';
 
-  // Timer
-  h+=`<div class="timer-card ${cerrado?'':''+slaClass(segs)}" style="background:${cerrado?'var(--card)':'var(--card)'};border:1px solid ${cerrado?'var(--border)':segs<7200?'rgba(16,185,129,.25)':segs<14400?'rgba(245,158,11,.25)':'rgba(239,68,68,.25)'}">
-    <div style="font-size:11px;color:var(--text-d);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px">Tiempo desde registro</div>
-    <div class="timer-val ${cerrado?'':slaClass(segs)}" id="liveTimer">${fmtDur(segs)}</div>
-    ${!cerrado?'<div style="font-size:11px;color:var(--primary);margin-top:6px">● En curso</div>':''}
+  // ── Timer total ──
+  h+=`<div class="card" style="border-color:${cerrado?'var(--border)':segs<7200?'rgba(16,185,129,.3)':segs<14400?'rgba(245,158,11,.3)':'rgba(239,68,68,.3)'}">
+    <div style="font-size:10px;font-weight:700;color:var(--text-d);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Tiempo total del proceso</div>
+    <div style="font-family:var(--fd);font-size:36px;font-weight:900;color:${cerrado?'var(--success)':segs<7200?'var(--success)':segs<14400?'var(--warning)':'var(--danger)'}" data-start="${cerrado?'':s.fecha_creacion}" id="detTimer">${cerrado?fmtDur(s.tiempo_total_seg||segs):fmtDur(segs)}</div>
+    ${!cerrado?'<div style="font-size:11px;color:var(--primary);margin-top:4px">● En curso</div>':''}
   </div>`;
 
-  // Info básica
+  // ── Info ──
   h+=`<div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <span class="tipo-badge tipo-${s.tipo}">${s.tipo}</span>
-      <div style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--accent)">${fmtMoney(s.monto)}</div>
+      <div style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--accent)">${fmtM(s.monto)}</div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div><div class="info-label">Asesor</div><div class="info-value" style="font-size:13px;font-weight:600">${esc(s.asesor_nombre||'—')}</div></div>
-      <div><div class="info-label">Registrado</div><div class="info-value" style="font-size:13px;font-weight:600">${fmtDt(s.fecha_creacion)}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
+      <div><div style="font-size:10px;color:var(--text-f);font-weight:700;text-transform:uppercase;margin-bottom:2px">Asesor</div><div style="font-weight:600">${esc(s.asesor_nombre||'—')}</div></div>
+      <div><div style="font-size:10px;color:var(--text-f);font-weight:700;text-transform:uppercase;margin-bottom:2px">Registrado</div><div style="font-weight:600">${fmtDt(s.fecha_creacion)}</div></div>
     </div>
-    ${s.notas_asesor?`<div style="margin-top:10px;padding:10px;background:var(--bg);border-radius:var(--r-sm)"><div style="font-size:10px;color:var(--text-f);font-weight:700;text-transform:uppercase;margin-bottom:3px">Nota del asesor</div><div style="font-size:13px;color:var(--text-s)">${esc(s.notas_asesor)}</div></div>`:''}
+    ${s.notas_asesor?`<div style="margin-top:10px;padding:10px;background:var(--bg);border-radius:var(--r-sm);font-size:12px;color:var(--text-s)"><span style="font-size:10px;font-weight:700;color:var(--text-f);text-transform:uppercase">Nota del asesor</span><br>${esc(s.notas_asesor)}</div>`:''}
+    ${s.notas_analista?`<div style="margin-top:8px;padding:10px;background:rgba(16,185,129,.05);border-radius:var(--r-sm);border:1px solid rgba(16,185,129,.2);font-size:12px;color:var(--text-s)"><span style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase">✓ Analista aprobó</span><br>${esc(s.notas_analista)}</div>`:''}
   </div>`;
 
-  // Evaluación del analista (contexto para el verificador)
-  if(s.decision_analista==='aprobado'){
-    h+=`<div class="card" style="border-color:rgba(16,185,129,.25)">
-      <div class="sec-title" style="color:var(--success)">✓ Aprobado por analista</div>
-      <div style="font-size:13px;color:var(--text-s)">${esc(s.analista_nombre||'Analista')}</div>
-      ${s.notas_analista?`<div style="font-size:12px;color:var(--text-d);margin-top:6px;padding:8px;background:var(--bg);border-radius:var(--r-sm)">"${esc(s.notas_analista)}"</div>`:''}
-    </div>`;
-  }
-
-  // GPS Trabajo
-  h+=`<div class="card">
-    <div class="sec-title">🏢 Trabajo</div>
-    ${mio&&!cerrado?`
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <button class="btn btn-ghost btn-block" onclick="capturarGPS('trabajo')">📍 Capturar coordenadas de trabajo</button>
-        <div id="gpsTrabajoResult">${s.verif_trabajo_coords?`<div class="gps-card"><div class="gps-icon gps-ok"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><div style="font-size:12px;font-weight:600">${s.verif_trabajo_coords}</div><a class="gps-link" href="https://maps.google.com/?q=${s.verif_trabajo_coords}" target="_blank">Ver en Maps →</a></div></div>`:'<div style="font-size:12px;color:var(--text-f)">Sin coordenadas aún</div>'}</div>
-        <div class="field">
-          <label class="field-label">Notas del trabajo</label>
-          <textarea class="textarea" id="notasTrabajo" placeholder="Empresa, dirección, referencias...">${esc(s.verif_trabajo_notas||'')}</textarea>
-        </div>
-      </div>
-    `:`
-      ${s.verif_trabajo_coords?`<div class="gps-card"><div class="gps-icon gps-ok">✓</div><div><div style="font-size:12px;font-weight:600">${s.verif_trabajo_coords}</div><a class="gps-link" href="https://maps.google.com/?q=${s.verif_trabajo_coords}" target="_blank">Ver en Maps →</a></div></div>`:'<div style="font-size:12px;color:var(--text-f)">Sin coordenadas registradas</div>'}
-      ${s.verif_trabajo_notas?`<div style="font-size:13px;color:var(--text-s);margin-top:8px">${esc(s.verif_trabajo_notas)}</div>`:''}
-    `}
-  </div>`;
-
-  // GPS Domicilio
-  h+=`<div class="card">
-    <div class="sec-title">🏠 Domicilio</div>
-    ${mio&&!cerrado?`
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <button class="btn btn-ghost btn-block" onclick="capturarGPS('domicilio')">📍 Capturar coordenadas de domicilio</button>
-        <div id="gpsDomResult">${s.verif_domicilio_coords?`<div class="gps-card"><div class="gps-icon gps-ok"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><div style="font-size:12px;font-weight:600">${s.verif_domicilio_coords}</div><a class="gps-link" href="https://maps.google.com/?q=${s.verif_domicilio_coords}" target="_blank">Ver en Maps →</a></div></div>`:'<div style="font-size:12px;color:var(--text-f)">Sin coordenadas aún</div>'}</div>
-        <div class="field">
-          <label class="field-label">Notas del domicilio</label>
-          <textarea class="textarea" id="notasDomicilio" placeholder="Colonia, referencias, confirmación...">${esc(s.verif_domicilio_notas||'')}</textarea>
-        </div>
-      </div>
-    `:`
-      ${s.verif_domicilio_coords?`<div class="gps-card"><div class="gps-icon gps-ok">✓</div><div><div style="font-size:12px;font-weight:600">${s.verif_domicilio_coords}</div><a class="gps-link" href="https://maps.google.com/?q=${s.verif_domicilio_coords}" target="_blank">Ver en Maps →</a></div></div>`:'<div style="font-size:12px;color:var(--text-f)">Sin coordenadas registradas</div>'}
-      ${s.verif_domicilio_notas?`<div style="font-size:13px;color:var(--text-s);margin-top:8px">${esc(s.verif_domicilio_notas)}</div>`:''}
-    `}
-  </div>`;
-
-  // Checklist verificación
-  if(mio&&!cerrado){
-    const done=VERIF_DOCS.filter(d=>checkState[d.key]).length;
-    const total=VERIF_DOCS.length;
+  // ── PUNTOS DE VERIFICACIÓN ──
+  if(!cerrado&&mio){
     h+=`<div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="sec-title" style="margin-bottom:0">Checklist verificación</div>
-        <span style="font-size:12px;font-weight:600;color:${done===total?'var(--success)':'var(--text-d)'}">${done}/${total}</span>
+        <div class="sec" style="margin-bottom:0">Puntos a verificar</div>
+        <button class="btn btn-ghost btn-sm" onclick="abrirAgregarPunto()">+ Agregar</button>
       </div>
-      <div class="progress-bar" style="margin-bottom:12px">
-        <div class="progress-fill" style="width:${total?done/total*100:0}%;background:${done===total?'var(--success)':'var(--primary)'}"></div>
+      <div id="mapaPuntos" style="display:${puntos.length?'block':'none'}"></div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-top:${puntos.length?'10px':'0'}" id="puntosList">
+        ${renderPuntosHtml()}
       </div>
-      <div style="display:flex;flex-direction:column;gap:7px" id="checklistContainer">
-        ${VERIF_DOCS.map(d=>`
-          <div class="check-item${checkState[d.key]?' checked':''}" id="chk_${d.key}" onclick="toggleCheck('${d.key}')">
-            <div class="check-box">${checkSvg}</div>
-            <span class="check-label">${esc(d.label)}</span>
-          </div>`).join('')}
+      ${!puntos.length?`<div style="text-align:center;padding:16px;color:var(--text-f);font-size:13px">Sin puntos agregados. Agrega trabajo y domicilio del cliente.</div>`:''}
+      ${puntos.length>1?`<button class="btn btn-ghost btn-sm btn-block" style="margin-top:8px" onclick="optimizarRuta()">🗺 Ordenar por distancia óptima</button>`:''}
+    </div>`;
+  } else if(puntos.length&&cerrado){
+    h+=`<div class="card">
+      <div class="sec">Puntos verificados</div>
+      <div style="display:flex;flex-direction:column;gap:7px">${renderPuntosHtml(true)}</div>
+    </div>`;
+  }
+
+  // ── CHECKLIST (solo si está en verificación) ──
+  if(iniciado){
+    const reqKeys=Object.keys(checkState);
+    const done=reqKeys.filter(k=>checkState[k]).length;
+    const total=reqKeys.length;
+    h+=`<div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="sec" style="margin-bottom:0">Checklist de verificación</div>
+        <span style="font-size:12px;font-weight:700;color:${done===total&&total?'var(--success)':'var(--text-d)'}">${done}/${total}</span>
       </div>
-      <button class="btn btn-ghost btn-block" style="margin-top:12px" onclick="guardarChecklist()">Guardar checklist</button>
+      <div class="prog-bar" style="margin-bottom:10px">
+        <div class="prog-fill" id="chkProg" style="width:${total?done/total*100:0}%;background:${done===total&&total?'var(--success)':'var(--primary)'}"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px" id="chkList">
+        ${reqKeys.map(k=>{
+          const lbl=(s.requisitos_asignados_labels||{})[k]||k;
+          return`<div class="check-item${checkState[k]?' checked':''}" id="chk_${k}" onclick="toggleChk('${k}')">
+            <div class="chk-box">${CHKSV}</div>
+            <span class="chk-label">${esc(lbl)}</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <button class="btn btn-ghost btn-block btn-sm" style="margin-top:10px" onclick="guardarChecklist()">Guardar checklist</button>
     </div>`;
   } else if(cerrado&&s.checklist_verificacion){
-    const done=Object.values(s.checklist_verificacion).filter(Boolean).length;
+    const cv=s.checklist_verificacion; const rls=s.requisitos_asignados_labels||{};
+    const ks=Object.keys(cv);
     h+=`<div class="card">
-      <div class="sec-title">Checklist completado (${done}/${VERIF_DOCS.length})</div>
-      ${VERIF_DOCS.map(d=>`<div class="check-item ${s.checklist_verificacion[d.key]?'checked':''} disabled"><div class="check-box">${checkSvg}</div><span class="check-label">${esc(d.label)}</span></div>`).join('')}
+      <div class="sec">Checklist completado (${ks.filter(k=>cv[k]).length}/${ks.length})</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        ${ks.map(k=>`<div class="check-item ${cv[k]?'checked':''} disabled"><div class="chk-box">${CHKSV}</div><span class="chk-label">${esc(rls[k]||k)}</span></div>`).join('')}
+      </div>
+    </div>`;
+  } else if(s.estatus==='aprobado'){
+    h+=`<div class="card" style="border-color:rgba(59,130,246,.3);text-align:center;padding:20px">
+      <div style="font-size:32px;margin-bottom:8px">👆</div>
+      <div style="font-weight:700;color:var(--primary)">Presiona INICIAR VERIFICACIÓN</div>
+      <div style="font-size:12px;color:var(--text-d);margin-top:4px">Para poder acceder al checklist y capturar ubicaciones</div>
     </div>`;
   }
 
-  // Notas verificador (si cerrado)
+  // ── NOTAS VERIFICADOR (si cerrado) ──
   if(cerrado&&s.notas_verificador){
-    h+=`<div class="card"><div class="sec-title">Notas del verificador</div><div style="font-size:13px;color:var(--text-s)">${esc(s.notas_verificador)}</div></div>`;
-  }
-
-  // Resultado si cerrado
-  if(cerrado){
-    const color=s.decision_verificador==='aprobado'?'var(--success)':s.estatus==='cancelado'?'var(--warning)':'var(--danger)';
-    h+=`<div class="card" style="border-color:${color}30;text-align:center;padding:20px">
-      <div style="font-size:32px;margin-bottom:8px">${s.decision_verificador==='aprobado'?'✅':s.estatus==='cancelado'?'⚠️':'❌'}</div>
-      <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:${color}">${(s.decision_verificador||s.estatus||'').toUpperCase()}</div>
-      ${s.fecha_fin?`<div style="font-size:12px;color:var(--text-d);margin-top:4px">Cerrada: ${fmtDt(s.fecha_fin)}</div>`:''}
-      ${s.tiempo_total_seg?`<div style="font-size:13px;font-weight:700;margin-top:4px;color:var(--text-s)">Duración: ${fmtDur(s.tiempo_total_seg)}</div>`:''}
+    const color=s.decision_verificador==='aprobado'?'var(--success)':'var(--danger)';
+    h+=`<div class="card" style="border-color:${color}30">
+      <div style="font-size:12px;font-weight:700;color:${color};margin-bottom:6px">${s.decision_verificador==='aprobado'?'✅ VERIFICACIÓN APROBADA':'❌ VERIFICACIÓN RECHAZADA'}</div>
+      <div style="font-size:13px;color:var(--text-s)">${esc(s.notas_verificador)}</div>
+      ${s.tiempo_total_seg?`<div style="font-size:11px;color:var(--text-d);margin-top:6px">Duración total: ${fmtDur(s.tiempo_total_seg)}</div>`:''}
     </div>`;
   }
 
-  // Timeline
-  h+=`<div class="card"><div class="sec-title">Historial</div><div class="tl">
+  // ── HISTORIAL ──
+  h+=`<div class="card"><div class="sec">Historial de cambios</div><div class="tl">
     ${hist.map((x,i)=>`<div class="tl-item">
-      <div class="tl-dot-w">
-        <div class="tl-dot" style="background:${i===0?'var(--primary)':'var(--text-f)'}"></div>
-        ${i<hist.length-1?'<div class="tl-line"></div>':''}
-      </div>
-      <div>
-        <div class="tl-text">${esc(x.accion)}</div>
-        <div class="tl-meta">${fmtDt(x.timestamp)} · <strong>${esc(x.usuario_nombre)}</strong></div>
-      </div>
+      <div class="tl-dw"><div class="tl-dot" style="background:${i===0?'var(--primary)':'var(--text-f)'}"></div>${i<hist.length-1?'<div class="tl-ln"></div>':''}</div>
+      <div><div class="tl-txt">${esc(x.accion)}</div><div class="tl-meta">${fmtDt(x.timestamp)} · <strong>${esc(x.usuario_nombre)}</strong></div></div>
     </div>`).join('')}
   </div></div>`;
 
   document.getElementById('detContent').innerHTML=h;
-  renderActionBar(s);
-  showScreen('scrDetalle');
+  renderDetBar(s);
+  goScreen('sDet');
+
+  // Init mapa puntos si hay
+  if(puntos.length&&!cerrado) setTimeout(()=>initMapaPuntos(),200);
 }
 
-function badgeHtml(e){
-  const labels={pendiente:'Pendiente',en_analisis:'En análisis',aprobado:'Aprobado',en_verificacion:'En campo',verificado:'Verificado',rechazado:'Rechazado',cancelado:'Cancelado'};
-  return`<span class="badge b-${e}"><span class="badge-dot" style="background:currentColor"></span>${labels[e]||e}</span>`;
+// ── PUNTOS HTML ───────────────
+function renderPuntosHtml(readOnly=false){
+  if(!puntos.length) return '';
+  return puntos.map((p,i)=>`
+    <div class="punto-item${p.visitado?' punto-done':''}" id="punto_${i}">
+      <div class="punto-num">${p.visitado?'✓':i+1}</div>
+      <div class="punto-info">
+        <div class="punto-nombre">${esc(p.nombre)}</div>
+        <div class="punto-dist">${p.tipo} ${p.distancia_m?'· '+fmtKm(p.distancia_m):''}${p.distancia_km_ruta?` · ~${p.distancia_km_ruta.toFixed(1)}km por ruta`:''}</div>
+        ${p.coords?`<a href="https://maps.google.com/?q=${p.coords}" target="_blank" style="font-size:11px;color:var(--primary)">Ver en Maps →</a>`:''}
+      </div>
+      ${!readOnly?`<div class="punto-actions">
+        <button class="btn-mini" onclick="moverPunto(${i},-1)" ${i===0?'style="opacity:.3;pointer-events:none"':''}>↑</button>
+        <button class="btn-mini" onclick="moverPunto(${i},1)" ${i===puntos.length-1?'style="opacity:.3;pointer-events:none"':''}>↓</button>
+        ${!p.visitado&&detId?`<button class="btn-mini" style="background:rgba(16,185,129,.1);color:var(--success);border-color:rgba(16,185,129,.3)" onclick="capturarGPSPunto(${i})">📍</button>`:''}
+        <button class="btn-mini" style="background:rgba(239,68,68,.08);color:var(--danger)" onclick="eliminarPunto(${i})">✕</button>
+      </div>`:''}
+    </div>`).join('');
 }
 
-function renderActionBar(s){
-  const bar=document.getElementById('detActionBar');
+function moverPunto(idx, dir){
+  const ti=idx+dir;
+  if(ti<0||ti>=puntos.length) return;
+  [puntos[idx],puntos[ti]]=[puntos[ti],puntos[idx]];
+  guardarPuntos();
+  document.getElementById('puntosList').innerHTML=renderPuntosHtml();
+  if(puntos.length) setTimeout(()=>initMapaPuntos(),100);
+}
+
+function eliminarPunto(idx){
+  puntos.splice(idx,1);
+  guardarPuntos();
+  document.getElementById('puntosList').innerHTML=renderPuntosHtml();
+  document.getElementById('mapaPuntos').style.display=puntos.length?'block':'none';
+  if(puntos.length) setTimeout(()=>initMapaPuntos(),100);
+}
+
+async function guardarPuntos(){
+  if(!detId) return;
+  await db.from('solicitudes').update({puntos_verificacion:puntos,actualizado_por:SES.nombre}).eq('id',detId);
+}
+
+// ── AGREGAR PUNTO ─────────────
+function abrirAgregarPunto(){
+  openSheet('Agregar punto de verificación',
+    `<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:-6px">
+      <div class="field"><label class="lbl">Nombre / Descripción</label><input class="input" id="pNombre" placeholder="Ej: Trabajo — Mueblería Los Ángeles"></div>
+      <div class="field"><label class="lbl">Tipo</label>
+        <select class="select" id="pTipo"><option value="Trabajo">Trabajo</option><option value="Domicilio">Domicilio</option><option value="Otro">Otro</option></select>
+      </div>
+      <div class="field"><label class="lbl">Coordenadas aproximadas (opcional)</label><input class="input" id="pCoords" placeholder="15.123456, -87.654321 o pegar de Maps"></div>
+      <button class="btn btn-ghost btn-sm" onclick="usarGPSActual()" style="margin-top:-4px">📍 Usar mi ubicación actual</button>
+    </div>`,
+    null, // sin textarea de notas
+    ()=>{
+      const nombre=document.getElementById('pNombre')?.value.trim();
+      const tipo=document.getElementById('pTipo')?.value||'Trabajo';
+      const coords=document.getElementById('pCoords')?.value.trim();
+      if(!nombre){toast('Escribe un nombre','error');return false;}
+      puntos.push({nombre,tipo,coords:coords||'',visitado:false,distancia_m:null,distancia_km_ruta:null});
+      guardarPuntos();
+      const pl=document.getElementById('puntosList');
+      if(pl) pl.innerHTML=renderPuntosHtml();
+      const mp=document.getElementById('mapaPuntos');
+      if(mp){mp.style.display='block';setTimeout(()=>initMapaPuntos(),200);}
+      toast('Punto agregado','success');
+      return true;
+    }
+  );
+}
+
+function usarGPSActual(){
+  if(!lastPos){toast('GPS no disponible aún','warning');return;}
+  const inp=document.getElementById('pCoords');
+  if(inp) inp.value=`${lastPos.lat.toFixed(6)},${lastPos.lng.toFixed(6)}`;
+  toast('Coordenadas actuales ingresadas','success');
+}
+
+// ── GPS POR PUNTO ─────────────
+async function capturarGPSPunto(idx){
+  if(!navigator.geolocation){toast('GPS no disponible','error');return;}
+  toast('Obteniendo ubicación...','info');
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const coords=`${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}`;
+    puntos[idx].coords=coords;
+    puntos[idx].visitado=true;
+    puntos[idx].timestamp_visita=now();
+    await guardarPuntos();
+    await registrarHist(detId,`GPS capturado: ${puntos[idx].nombre} — ${coords}`,'en_verificacion','en_verificacion',{punto:puntos[idx].nombre,coords});
+    document.getElementById('puntosList').innerHTML=renderPuntosHtml();
+    setTimeout(()=>initMapaPuntos(),100);
+    toast(`📍 ${puntos[idx].nombre} marcado`,'success');
+  },
+  ()=>toast('No se pudo obtener GPS. Activa la ubicación.','error'),
+  {enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
+
+// ── OPTIMIZAR RUTA (OSRM) ─────
+async function optimizarRuta(){
+  if(!lastPos){toast('Necesito tu ubicación GPS para optimizar','warning');return;}
+  if(puntos.length<2){toast('Agrega al menos 2 puntos','warning');return;}
+
+  toast('Calculando ruta óptima...','info');
+  try{
+    const conCoords=puntos.filter(p=>p.coords);
+    if(!conCoords.length){toast('Los puntos no tienen coordenadas','warning');return;}
+
+    // Construir lista con mi posición primero
+    const allCoords=[
+      {lat:lastPos.lat,lng:lastPos.lng},
+      ...puntos.map(p=>{
+        if(!p.coords) return null;
+        const parts=p.coords.split(',').map(Number);
+        return{lat:parts[0],lng:parts[1]};
+      }).filter(Boolean)
+    ];
+
+    // OSRM trip API — optimización de ruta
+    const coordStr=allCoords.map(c=>`${c.lng},${c.lat}`).join(';');
+    const url=`https://router.project-osrm.org/trip/v1/driving/${coordStr}?source=first&roundtrip=false&annotations=true`;
+    const resp=await fetch(url);
+    const data=await resp.json();
+
+    if(data.code!=='Ok'||!data.trips?.length){toast('No se pudo calcular ruta','error');return;}
+
+    const trip=data.trips[0];
+    const waypoints=data.waypoints.sort((a,b)=>a.waypoint_index-b.waypoint_index);
+
+    // Reordenar puntos según la ruta óptima (skip waypoint 0 = mi posición)
+    const nuevoPuntos=[];
+    waypoints.forEach(wp=>{
+      if(wp.waypoint_index===0) return; // mi posición
+      const pIdx=wp.waypoint_index-1;
+      if(puntos[pIdx]) nuevoPuntos.push({...puntos[pIdx]});
+    });
+
+    // Calcular distancias entre legs
+    const legs=trip.legs||[];
+    nuevoPuntos.forEach((p,i)=>{
+      if(legs[i]) p.distancia_km_ruta=legs[i].distance/1000;
+    });
+
+    puntos=nuevoPuntos;
+    await guardarPuntos();
+    document.getElementById('puntosList').innerHTML=renderPuntosHtml();
+    setTimeout(()=>initMapaPuntos(),100);
+
+    const totalKm=(trip.distance/1000).toFixed(1);
+    const totalMin=Math.round(trip.duration/60);
+    toast(`Ruta optimizada: ${totalKm}km — ~${totalMin} min`,'success');
+  }catch(e){
+    console.error(e);
+    // Fallback: ordenar por distancia haversine
+    ordenarPorDistanciaLocal();
+  }
+}
+
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371000;const dLat=(lat2-lat1)*Math.PI/180;const dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function ordenarPorDistanciaLocal(){
+  if(!lastPos) return;
+  puntos.forEach(p=>{
+    if(p.coords){
+      const parts=p.coords.split(',').map(Number);
+      p.distancia_m=haversine(lastPos.lat,lastPos.lng,parts[0],parts[1]);
+    }
+  });
+  puntos.sort((a,b)=>(a.distancia_m||99999)-(b.distancia_m||99999));
+  guardarPuntos();
+  document.getElementById('puntosList').innerHTML=renderPuntosHtml();
+  setTimeout(()=>initMapaPuntos(),100);
+  toast('Puntos ordenados por distancia','success');
+}
+
+// ── MAPA PUNTOS (Leaflet) ─────
+function initMapaPuntos(){
+  const el=document.getElementById('mapaPuntos');
+  if(!el) return;
+  if(mapaP){mapaP.remove();mapaP=null;}
+  mapaP=L.map('mapaPuntos',{zoomControl:false,attributionControl:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(mapaP);
+
+  const lls=[];
+  if(lastPos){
+    L.circleMarker([lastPos.lat,lastPos.lng],{radius:8,color:'#3B82F6',fillColor:'#3B82F6',fillOpacity:1}).addTo(mapaP).bindPopup('Tu posición');
+    lls.push([lastPos.lat,lastPos.lng]);
+  }
+  puntos.forEach((p,i)=>{
+    if(!p.coords) return;
+    const parts=p.coords.split(',').map(Number);
+    if(isNaN(parts[0])||isNaN(parts[1])) return;
+    const color=p.visitado?'#10B981':'#F59E0B';
+    const icon=L.divIcon({html:`<div style="width:28px;height:28px;border-radius:50%;background:${color};border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4)">${p.visitado?'✓':i+1}</div>`,className:'',iconSize:[28,28],iconAnchor:[14,14]});
+    L.marker([parts[0],parts[1]],{icon}).addTo(mapaP).bindPopup(`<strong>${p.nombre}</strong><br>${p.tipo}`);
+    lls.push([parts[0],parts[1]]);
+  });
+
+  // Línea conectando puntos
+  if(lls.length>1) L.polyline(lls,{color:'#3B82F6',weight:2,dashArray:'6,4',opacity:.7}).addTo(mapaP);
+  if(lls.length) mapaP.fitBounds(L.latLngBounds(lls),{padding:[16,16]});
+}
+
+// ── CHECKLIST ────────────────
+function toggleChk(key){
+  checkState[key]=!checkState[key];
+  const el=document.getElementById('chk_'+key);
+  if(el) el.classList.toggle('checked',checkState[key]);
+  const done=Object.values(checkState).filter(Boolean).length;
+  const total=Object.keys(checkState).length;
+  const pf=document.getElementById('chkProg');
+  if(pf){pf.style.width=(total?done/total*100:0)+'%';pf.style.background=done===total&&total?'var(--success)':'var(--primary)';}
+}
+
+async function guardarChecklist(){
+  if(!detId) return;
+  const s=SOLIS.find(x=>x.id===detId);
+  const labels=s?.requisitos_asignados_labels||{};
+  const {error}=await db.from('solicitudes').update({
+    checklist_verificacion:checkState,
+    requisitos_asignados_labels:labels,
+    actualizado_por:SES.nombre
+  }).eq('id',detId);
+  if(error){toast('Error guardando','error');return;}
+  await registrarHist(detId,`Checklist actualizado por ${SES.nombre}`,'en_verificacion','en_verificacion',{checklist:checkState});
+  toast('Checklist guardado ✓','success');
+}
+
+// ── ACTION BAR ────────────────
+function renderDetBar(s){
+  const bar=document.getElementById('detBar');
   const cerrado=['verificado','rechazado','cancelado'].includes(s.estatus);
   if(cerrado){bar.classList.remove('show');return;}
   bar.classList.add('show');
 
   if(s.estatus==='aprobado'){
-    bar.innerHTML=`<button class="action-bar-main bar-iniciar" onclick="iniciarVerificacion('${s.id}')">
-      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
+    bar.innerHTML=`<button class="bar-main bar-iniciar" onclick="iniciarVerif('${s.id}')">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
       INICIAR VERIFICACIÓN
     </button>`;
-  } else if(s.estatus==='en_verificacion'&&s.verificador_id===SESSION.id){
+  } else if(s.estatus==='en_verificacion'&&s.verificador_id===SES.id){
     bar.innerHTML=`
-      <button class="action-bar-main bar-aprobar" onclick="finalizar('${s.id}','aprobado')">
+      <button class="bar-main bar-aprobar" onclick="abrirFinalizar('aprobado')">
         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         APROBAR VERIFICACIÓN
       </button>
-      <div class="action-bar-sub">
-        <button class="btn btn-danger btn-block" onclick="finalizar('${s.id}','rechazado')">✕ Rechazar</button>
+      <div class="bar-sub">
+        <button class="btn btn-danger btn-block" onclick="abrirFinalizar('rechazado')">✕ Rechazar verificación</button>
       </div>`;
   }
 }
 
-// ══ ACCIONES ════════════════════════
-async function iniciarVerificacion(id){
+// ── INICIAR VERIFICACIÓN ──────
+async function iniciarVerif(id){
   const {error}=await db.from('solicitudes').update({
     estatus:'en_verificacion',
-    verificador_id:SESSION.id,
-    verificador_nombre:SESSION.nombre,
+    verificador_id:SES.id,
+    verificador_nombre:SES.nombre,
     fecha_asignacion_verif:now(),
     fecha_verificacion_inicio:now(),
-    actualizado_por:SESSION.nombre,
+    actualizado_por:SES.nombre,
   }).eq('id',id);
   if(error){toast('Error: '+error.message,'error');return;}
-  await registrarHistorial(id,`Verificación iniciada por ${SESSION.nombre}`,'en_verificacion','aprobado');
+  await registrarHist(id,`Verificación iniciada por ${SES.nombre}`,'en_verificacion','aprobado');
   toast('Verificación iniciada','success');
   await cargarSolicitudes();
-  await abrirDetalle(id);
+  await abrirDet(id);
 }
 
-async function guardarChecklist(){
-  if(!detSolId)return;
-  // Guardar notas también si existen
-  const notasTrab=document.getElementById('notasTrabajo')?.value||'';
-  const notasDom=document.getElementById('notasDomicilio')?.value||'';
-  const {error}=await db.from('solicitudes').update({
-    checklist_verificacion:checkState,
-    verif_trabajo_notas:notasTrab||undefined,
-    verif_domicilio_notas:notasDom||undefined,
-    actualizado_por:SESSION.nombre,
-  }).eq('id',detSolId);
-  if(error){toast('Error guardando','error');return;}
-  await registrarHistorial(detSolId,`Checklist actualizado por ${SESSION.nombre}`,'en_verificacion','en_verificacion',{checklist:checkState});
-  toast('Checklist guardado','success');
-}
-
-async function finalizar(id,decision){
-  const notas=await pedirNotas(`¿${decision==='aprobado'?'Aprobar':'Rechazar'} esta verificación?`,`Escribe las observaciones finales de la verificación:`);
-  if(notas===null)return; // canceló
-
-  const s=SOLIS.find(x=>x.id===id)||{};
-  const {error}=await db.from('solicitudes').update({
-    estatus:decision==='aprobado'?'verificado':'rechazado',
-    decision_verificador:decision,
-    notas_verificador:notas,
-    verif_trabajo_notas:document.getElementById('notasTrabajo')?.value||s.verif_trabajo_notas||'',
-    verif_domicilio_notas:document.getElementById('notasDomicilio')?.value||s.verif_domicilio_notas||'',
-    verif_trabajo_ok:checkState.identidad_trabajo&&checkState.coordenadas_trabajo,
-    verif_domicilio_ok:checkState.identidad_domicilio&&checkState.coordenadas_domicilio,
-    checklist_verificacion:checkState,
-    fecha_fin:now(),
-    actualizado_por:SESSION.nombre,
-  }).eq('id',id);
-
-  if(error){toast('Error: '+error.message,'error');return;}
-  await registrarHistorial(id,
-    `Verificación ${decision==='aprobado'?'APROBADA':'RECHAZADA'} por ${SESSION.nombre}. ${notas}`,
-    decision==='aprobado'?'verificado':'rechazado','en_verificacion');
-
-  // Notificar a panel
-  await notificarRol(['asesor','analista','admin'],id,
-    `Verificación ${decision==='aprobado'?'aprobada ✓':'rechazada ✕'}: ${s.cliente||id}`,'asignacion');
-
-  toast(`Solicitud ${decision==='aprobado'?'aprobada':'rechazada'}`,'success');
-  await cargarSolicitudes();
-  renderDash();
-  volverDash();
-}
-
-function toggleCheck(key){
-  checkState[key]=!checkState[key];
-  const el=document.getElementById('chk_'+key);
-  if(el)el.classList.toggle('checked',checkState[key]);
-  // Update progress
-  const done=VERIF_DOCS.filter(d=>checkState[d.key]).length;
-  const total=VERIF_DOCS.length;
-  const fill=document.querySelector('.progress-fill');
-  if(fill){fill.style.width=(done/total*100)+'%';fill.style.background=done===total?'var(--success)':'var(--primary)';}
-}
-
-async function capturarGPS(tipo){
-  if(!navigator.geolocation){toast('GPS no disponible en este dispositivo','error');return;}
-  toast('Obteniendo ubicación...','info');
-  navigator.geolocation.getCurrentPosition(
-    async pos=>{
-      const coords=`${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}`;
-      const field=tipo==='trabajo'?'verif_trabajo_coords':'verif_domicilio_coords';
-      const {error}=await db.from('solicitudes').update({[field]:coords,actualizado_por:SESSION.nombre}).eq('id',detSolId);
-      if(error){toast('Error guardando GPS','error');return;}
-      await registrarHistorial(detSolId,`GPS de ${tipo} capturado: ${coords}`,'en_verificacion','en_verificacion',{tipo,coords});
-      const resultEl=document.getElementById(tipo==='trabajo'?'gpsTrabajoResult':'gpsDomResult');
-      if(resultEl)resultEl.innerHTML=`<div class="gps-card"><div class="gps-icon gps-ok"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><div style="font-size:12px;font-weight:600">${coords}</div><a class="gps-link" href="https://maps.google.com/?q=${coords}" target="_blank">Ver en Maps →</a></div></div>`;
-      toast(`Coordenadas de ${tipo} guardadas ✓`,'success');
-    },
-    err=>{toast('No se pudo obtener ubicación. Activa el GPS.','error');console.error(err);},
-    {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+// ── FINALIZAR (sheet) ─────────
+function abrirFinalizar(decision){
+  const emoji=decision==='aprobado'?'✅':'❌';
+  const color=decision==='aprobado'?'var(--success)':'var(--danger)';
+  openSheet(
+    `${emoji} ${decision==='aprobado'?'Aprobar':'Rechazar'} verificación`,
+    `<div style="padding:10px 14px;background:${decision==='aprobado'?'rgba(16,185,129,.08)':'rgba(239,68,68,.08)'};border-radius:var(--r-sm);border:1px solid ${color}30;margin-bottom:4px">
+      Escribe un resumen de lo encontrado en la verificación. Esta nota quedará en el historial permanente.
+    </div>`,
+    decision,
+    async nota=>{
+      await ejecutarFinalizar(detId, decision, nota);
+      return true;
+    }
   );
 }
 
-function volverDash(){
-  detSolId=null;
-  showScreen('scrDash');
+async function ejecutarFinalizar(id, decision, nota){
+  const s=SOLIS.find(x=>x.id===id)||{};
+  const tiemp=s.fecha_creacion?Math.floor((Date.now()-new Date(s.fecha_creacion).getTime())/1000):null;
+
+  const {error}=await db.from('solicitudes').update({
+    estatus:decision==='aprobado'?'verificado':'rechazado',
+    decision_verificador:decision,
+    notas_verificador:nota,
+    verif_trabajo_ok:puntos.filter(p=>p.tipo==='Trabajo'&&p.visitado).length>0,
+    verif_domicilio_ok:puntos.filter(p=>p.tipo==='Domicilio'&&p.visitado).length>0,
+    verif_trabajo_coords:puntos.filter(p=>p.tipo==='Trabajo'&&p.coords)[0]?.coords||null,
+    verif_domicilio_coords:puntos.filter(p=>p.tipo==='Domicilio'&&p.coords)[0]?.coords||null,
+    checklist_verificacion:checkState,
+    fecha_fin:now(),
+    tiempo_total_seg:tiemp,
+    actualizado_por:SES.nombre,
+  }).eq('id',id);
+
+  if(error){toast('Error: '+error.message,'error');return;}
+
+  await registrarHist(id,
+    `Verificación ${decision==='aprobado'?'APROBADA ✓':'RECHAZADA ✕'} por ${SES.nombre}. ${nota}`,
+    decision==='aprobado'?'verificado':'rechazado','en_verificacion');
+
+  // Notificar panel
+  await notificarRoles(['asesor','analista','admin'],id,
+    `Verificación ${decision==='aprobado'?'aprobada ✓':'rechazada ✕'}: ${s.cliente||''}`,decision);
+
+  toast(`Solicitud ${decision==='aprobado'?'aprobada ✓':'rechazada'}`,'success');
+  await cargarSolicitudes();
+  renderDash();
+  goScreen('sDash');
 }
 
-// ══ GPS EN VIVO (para el mapa del panel) ════
-let lastLat=null,lastLng=null;
-
+// ── GPS EN VIVO ───────────────
 function iniciarGPS(){
-  if(!navigator.geolocation)return;
-  // Primera ubicación
-  navigator.geolocation.getCurrentPosition(pos=>enviarUbicacion(pos),null,{enableHighAccuracy:true});
-  // Cada 30 segundos
-  gpsInterval=setInterval(()=>{
-    navigator.geolocation.getCurrentPosition(pos=>enviarUbicacion(pos),null,{enableHighAccuracy:true,timeout:10000});
+  if(!navigator.geolocation) return;
+  // Watch continuo
+  gpsWatchId=navigator.geolocation.watchPosition(
+    pos=>procesarPos(pos),
+    err=>console.warn('GPS error',err),
+    {enableHighAccuracy:true,timeout:15000,maximumAge:10000}
+  );
+  // Enviar a Supabase cada 30 seg
+  gpsInterval=setInterval(async()=>{
+    if(lastPos) await enviarUbicacion();
   },30000);
+  // Registrar historial GPS cada 1 minuto
+  gpsHistInterval=setInterval(async()=>{
+    if(lastPos) await registrarGPSHist();
+  },60000);
 }
 
-async function enviarUbicacion(pos){
-  lastLat=pos.coords.latitude;lastLng=pos.coords.longitude;
-  const el=document.getElementById('gpsStatusText');
-  const ic=document.getElementById('gpsStatusIcon');
-  if(el)el.textContent=`${lastLat.toFixed(4)}, ${lastLng.toFixed(4)}`;
-  if(ic)ic.textContent='🟢';
+async function procesarPos(pos){
+  lastPos={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy};
+  const bar=document.getElementById('gpsBar');
+  const pulse=document.getElementById('gpsPulse');
+  const txt=document.getElementById('gpsBarTxt');
+  if(txt) txt.textContent=`GPS activo · ${lastPos.lat.toFixed(4)}, ${lastPos.lng.toFixed(4)} (±${Math.round(lastPos.acc)}m)`;
+  if(pulse){pulse.classList.remove('gps-inactive');pulse.classList.add('gps-active');}
+  // Primera vez: enviar inmediatamente
+  await enviarUbicacion();
+}
+
+async function enviarUbicacion(){
+  if(!lastPos||!SES) return;
   await db.from('ubicaciones_verificadores').upsert({
-    verificador_id:SESSION.id,
-    nombre:SESSION.nombre,
-    lat:lastLat,lng:lastLng,
-    precision_m:pos.coords.accuracy,
-    activo:true,
-    solicitud_activa:detSolId||null,
-    updated_at:now(),
+    verificador_id:SES.id,nombre:SES.nombre,
+    lat:lastPos.lat,lng:lastPos.lng,precision_m:lastPos.acc,
+    activo:true,solicitud_activa:detId||null,updated_at:now(),
   },{onConflict:'verificador_id'});
 }
 
-function forzarGPS(){
-  document.getElementById('gpsStatusText').textContent='Actualizando...';
-  navigator.geolocation?.getCurrentPosition(enviarUbicacion,
-    ()=>{toast('No se pudo actualizar GPS','error');},{enableHighAccuracy:true,timeout:10000});
+async function registrarGPSHist(){
+  if(!lastPos||!SES) return;
+  await db.from('historial_gps_verificador').insert([{
+    verificador_id:SES.id,verificador_nombre:SES.nombre,
+    lat:lastPos.lat,lng:lastPos.lng,precision_m:lastPos.acc,
+    solicitud_activa:detId||null,fecha_dia:new Date().toISOString().slice(0,10),
+  }]);
 }
 
-// ══ REALTIME ═════════════════════════
+function forzarGPS(){
+  if(!navigator.geolocation){toast('GPS no disponible','error');return;}
+  const txt=document.getElementById('gpsBarTxt');
+  if(txt) txt.textContent='Actualizando...';
+  navigator.geolocation.getCurrentPosition(procesarPos,
+    ()=>{toast('No se pudo obtener GPS','error');},{enableHighAccuracy:true,timeout:10000});
+}
+
+// ── REALTIME ──────────────────
 function suscribirRealtime(){
-  if(realtimeChan)db.removeChannel(realtimeChan);
-  realtimeChan=db.channel('verif_changes')
+  if(realtimeChan) db.removeChannel(realtimeChan);
+  realtimeChan=db.channel('verif_rt')
     .on('postgres_changes',{event:'*',schema:'public',table:'solicitudes'},async payload=>{
       const s=payload.new;
-      // Si una solicitud fue aprobada, recargar lista
-      if(s.estatus==='aprobado'||s.verificador_id===SESSION.id){
-        await cargarSolicitudes();
-        renderDash();
+      if(s.estatus==='aprobado'||s.verificador_id===SES.id){
+        await cargarSolicitudes();renderDash();
       }
     })
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'notificaciones'},payload=>{
-      if(payload.new?.usuario_id===SESSION.id){
+      if(payload.new?.usuario_id===SES.id){
         cargarNotificaciones();
         toast(payload.new.mensaje,'info');
       }
@@ -928,123 +1072,156 @@ function suscribirRealtime(){
     .subscribe();
 }
 
-// ══ NOTIFICACIONES ═══════════════════
+// ── HISTORIAL ────────────────
+async function renderHist(){
+  const {data}=await db.from('solicitudes').select('*')
+    .eq('verificador_id',SES.id).in('estatus',['verificado','rechazado'])
+    .order('fecha_fin',{ascending:false});
+  const list=data||[];
+  const c=document.getElementById('histContent');
+  if(!list.length){
+    c.innerHTML=`<div class="empty"><div class="empty-icon"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="empty-title">Sin verificaciones aún</div></div>`;
+    return;
+  }
+  const verif=list.filter(s=>s.estatus==='verificado');
+  const montoT=verif.reduce((a,s)=>a+Number(s.monto||0),0);
+  const tProm=verif.reduce((a,s)=>a+(s.tiempo_total_seg||0),0)/(verif.length||1);
+  c.innerHTML=`
+    <div class="stats-row" style="margin-bottom:4px">
+      <div class="stat-box"><div class="stat-val" style="color:var(--success)">${verif.length}</div><div class="stat-lbl">Aprobadas</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--accent);font-size:14px">${fmtM(montoT)}</div><div class="stat-lbl">Monto total</div></div>
+      <div class="stat-box"><div class="stat-val" style="font-size:16px">${fmtDur(Math.round(tProm))}</div><div class="stat-lbl">Prom. tiempo</div></div>
+    </div>
+    ${list.map(s=>`
+      <div class="card card-click" onclick="abrirDet('${s.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
+          <div><div style="font-size:15px;font-weight:700">${esc(s.cliente)}</div><span class="tipo-badge tipo-${s.tipo}" style="margin-top:4px">${s.tipo}</span></div>
+          ${badgeHtml(s.estatus)}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--accent)">${fmtM(s.monto)}</div>
+          <div style="font-size:11px;color:var(--text-d)">${s.tiempo_total_seg?fmtDur(s.tiempo_total_seg)+' · ':''} ${fmtDt(s.fecha_fin)}</div>
+        </div>
+      </div>`).join('')}`;
+}
+
+// ── NOTIFICACIONES ────────────
 async function cargarNotificaciones(){
-  const {data}=await db.from('notificaciones').select('*')
-    .eq('usuario_id',SESSION.id).order('creada_en',{ascending:false}).limit(20);
-  const notifs=data||[];
-  const noleidas=notifs.filter(n=>!n.leida).length;
-  document.getElementById('notifDot').style.display=noleidas>0?'block':'none';
-  window._notifs=notifs;
+  const {data}=await db.from('notificaciones').select('*').eq('usuario_id',SES.id).order('creada_en',{ascending:false}).limit(20);
+  const nol=(data||[]).filter(n=>!n.leida).length;
+  document.getElementById('notifDot').style.display=nol>0?'block':'none';
+  window._notifs=data||[];
 }
 
 function renderNotif(){
-  const notifs=window._notifs||[];
   const c=document.getElementById('notifContent');
-  if(!notifs.length){
-    c.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="empty-title">Sin notificaciones</div></div>`;
-    return;
-  }
+  const notifs=window._notifs||[];
+  if(!notifs.length){c.innerHTML=`<div class="empty"><div class="empty-title">Sin notificaciones</div></div>`;return;}
   c.innerHTML=notifs.map(n=>`
-    <div class="card card-click${n.leida?'':' '}" style="border-left:3px solid ${n.leida?'var(--border)':'var(--primary)'}" onclick="irANotif('${n.solicitud_id}','${n.id}')">
+    <div class="card card-click" style="border-left:3px solid ${n.leida?'var(--border)':'var(--primary)'}" onclick="irNotif('${n.solicitud_id}','${n.id}')">
       <div style="font-size:13px;font-weight:${n.leida?'500':'600'}">${esc(n.mensaje)}</div>
       <div style="font-size:11px;color:var(--text-d);margin-top:4px">${fmtDt(n.creada_en)}</div>
     </div>`).join('');
 }
 
-async function irANotif(solId,notifId){
+async function irNotif(solId,notifId){
   await db.from('notificaciones').update({leida:true}).eq('id',notifId);
   cargarNotificaciones();
-  await abrirDetalle(solId);
+  await abrirDet(solId);
 }
 
 async function marcarTodasLeidas(){
-  await db.from('notificaciones').update({leida:true}).eq('usuario_id',SESSION.id).eq('leida',false);
-  cargarNotificaciones();
-  renderNotif();
+  await db.from('notificaciones').update({leida:true}).eq('usuario_id',SES.id).eq('leida',false);
+  cargarNotificaciones();renderNotif();
   toast('Notificaciones leídas','success');
 }
 
-// ══ HISTORIAL ════════════════════════
-async function renderHistorial(){
-  const {data}=await db.from('solicitudes').select('*')
-    .eq('verificador_id',SESSION.id)
-    .in('estatus',['verificado','rechazado'])
-    .order('fecha_fin',{ascending:false});
-  const list=data||[];
-  const c=document.getElementById('histContent');
-  if(!list.length){
-    c.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="empty-title">Sin verificaciones finalizadas</div></div>`;
-    return;
-  }
-  const verif=list.filter(s=>s.estatus==='verificado');
-  const montoTotal=verif.reduce((a,s)=>a+Number(s.monto||0),0);
-  const tiempoProm=verif.reduce((a,s)=>a+(s.tiempo_total_seg||0),0)/(verif.length||1);
+// ── BOTTOM SHEET ──────────────
+function openSheet(titulo, bodyHtml, accionLabel, cb){
+  sheetCb=cb;
+  document.getElementById('sheetTitle').textContent=titulo;
+  document.getElementById('sheetBody').innerHTML=bodyHtml||'';
+  document.getElementById('sheetNota').value='';
 
-  c.innerHTML=`
-    <div class="stats-row" style="margin-bottom:4px">
-      <div class="stat-box"><div class="stat-val" style="color:var(--success)">${verif.length}</div><div class="stat-lbl">Verificadas</div></div>
-      <div class="stat-box"><div class="stat-val" style="color:var(--accent);font-size:14px">${fmtMoney(montoTotal)}</div><div class="stat-lbl">Total</div></div>
-      <div class="stat-box"><div class="stat-val" style="font-size:16px">${fmtDur(Math.round(tiempoProm))}</div><div class="stat-lbl">Promedio</div></div>
-    </div>
-    ${list.map(s=>`
-      <div class="card card-click" onclick="abrirDetalle('${s.id}')">
-        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
-          <div>
-            <div style="font-size:15px;font-weight:700">${esc(s.cliente)}</div>
-            <span class="tipo-badge tipo-${s.tipo}">${s.tipo}</span>
-          </div>
-          ${badgeHtml(s.estatus)}
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--accent)">${fmtMoney(s.monto)}</div>
-          <div style="font-size:11px;color:var(--text-d)">${s.tiempo_total_seg?fmtDur(s.tiempo_total_seg):''} · ${fmtDt(s.fecha_fin)}</div>
-        </div>
-      </div>`).join('')}`;
+  const okBtn=document.getElementById('sheetOkBtn');
+  okBtn.textContent=accionLabel==='aprobado'?'✓ Confirmar aprobación':accionLabel==='rechazado'?'✕ Confirmar rechazo':'Confirmar';
+  okBtn.className='btn '+(accionLabel==='aprobado'?'btn-success':accionLabel==='rechazado'?'btn-danger':'btn-primary');
+  okBtn.style.flex='1';
+
+  okBtn.onclick=async()=>{
+    const nota=document.getElementById('sheetNota').value.trim();
+    if(!nota){toast('Las notas son obligatorias','error');document.getElementById('sheetNota').focus();return;}
+    const result=await sheetCb(nota);
+    if(result!==false) closeSheet();
+  };
+
+  // Si no hay textarea de notas (agregar punto), quitar el campo
+  const notaField=document.getElementById('sheetNota').parentElement;
+  if(cb&&cb.length===0){notaField.style.display='none';}else{notaField.style.display='';}
+
+  document.getElementById('sheetBg').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+  setTimeout(()=>document.getElementById('sheetNota').focus(),300);
 }
 
-// ══ MODAL CONFIRM / NOTAS ════════════
-function pedirNotas(titulo,texto){
-  return new Promise(resolve=>{
-    document.getElementById('confirmTitle').textContent=titulo;
-    document.getElementById('confirmText').textContent=texto;
-    document.getElementById('confirmNota').style.display='block';
-    document.getElementById('confirmNotaInput').value='';
-    document.getElementById('confirmOkBtn').onclick=()=>{
-      const n=document.getElementById('confirmNotaInput').value.trim();
-      if(!n){toast('Las notas son obligatorias','error');return;}
-      closeConfirm();resolve(n);
-    };
-    confirmCb=()=>resolve(null);
-    document.getElementById('modalConfirm').classList.add('open');
-  });
-}
-function closeConfirm(){
-  document.getElementById('modalConfirm').classList.remove('open');
-  if(confirmCb){confirmCb();confirmCb=null;}
+function closeSheet(){
+  document.getElementById('sheetBg').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+  sheetCb=null;
 }
 
-// ══ HISTORIAL BD ═════════════════════
-async function registrarHistorial(solId,accion,estatusNuevo,estatusAnterior,metadata={}){
+// Sobrescribir openSheet para agregar punto (sin campo nota)
+const _origOpenSheet=openSheet;
+function openSheet(titulo, bodyHtml, accionLabel, cb){
+  sheetCb=cb;
+  document.getElementById('sheetTitle').textContent=titulo;
+  document.getElementById('sheetBody').innerHTML=bodyHtml||'';
+  document.getElementById('sheetNota').value='';
+
+  const notaWrap=document.getElementById('sheetNota').closest('.field');
+  const sinNota=!accionLabel||accionLabel===null;
+  if(notaWrap) notaWrap.style.display=sinNota?'none':'';
+
+  const okBtn=document.getElementById('sheetOkBtn');
+  okBtn.textContent=accionLabel==='aprobado'?'✓ Aprobar':accionLabel==='rechazado'?'✕ Rechazar':'Confirmar';
+  okBtn.className='btn '+(accionLabel==='aprobado'?'btn-success':accionLabel==='rechazado'?'btn-danger':'btn-primary');
+  okBtn.style.flex='1';
+
+  okBtn.onclick=async()=>{
+    if(!sinNota){
+      const nota=document.getElementById('sheetNota').value.trim();
+      if(!nota){toast('Las notas son obligatorias','error');document.getElementById('sheetNota').focus();return;}
+      const result=await cb(nota);
+      if(result!==false) closeSheet();
+    } else {
+      const result=await cb();
+      if(result!==false) closeSheet();
+    }
+  };
+
+  document.getElementById('sheetBg').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+  if(!sinNota) setTimeout(()=>document.getElementById('sheetNota').focus(),300);
+}
+
+// ── HISTORIAL BD ─────────────
+async function registrarHist(solId, accion, estatusNuevo, estatusAnterior, metadata={}){
   await db.from('historial_solicitud').insert([{
-    solicitud_id:solId,usuario_id:SESSION.id,usuario_nombre:SESSION.nombre,
-    usuario_rol:SESSION.rol,estatus_anterior:estatusAnterior,estatus_nuevo:estatusNuevo,
+    solicitud_id:solId,usuario_id:SES.id,usuario_nombre:SES.nombre,
+    usuario_rol:SES.rol,estatus_anterior:estatusAnterior,estatus_nuevo:estatusNuevo,
     accion,metadata,timestamp:now(),
   }]);
 }
 
-async function notificarRol(roles,solId,mensaje,tipo){
-  const rolesArr=Array.isArray(roles)?roles:[roles];
-  for(const rol of rolesArr){
+async function notificarRoles(roles, solId, mensaje, tipo){
+  for(const rol of roles){
     const {data}=await db.from('usuarios').select('id').eq('rol',rol).eq('activo',true);
-    if(data?.length){
-      await db.from('notificaciones').insert(data.map(u=>({usuario_id:u.id,solicitud_id:solId,mensaje,tipo})));
-    }
+    if(data?.length) await db.from('notificaciones').insert(data.map(u=>({usuario_id:u.id,solicitud_id:solId,mensaje,tipo})));
   }
 }
 
-// ══ BOOT ════════════════════════════
-document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+// ── BOOT ─────────────────────
+document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 restoreSession();
 </script>
 </body>
