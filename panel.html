@@ -55,37 +55,54 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
 /* ══ LAYOUT ══ */
-#app{display:none;height:100vh;overflow:hidden;flex-direction:column}
+#app{display:none;height:100dvh;min-height:0;overflow:hidden;flex-direction:column}
 #app.ready{display:flex}
-.top-bar{height:58px;min-height:58px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;z-index:100}
-.top-logo{font-family:var(--fd);font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--text),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
-.top-nav{display:flex;gap:4px;flex:1;overflow-x:auto;padding:4px 0}
+.top-bar{height:54px;min-height:54px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 10px 0 14px;gap:8px;z-index:100;flex-shrink:0}
+.top-logo{font-family:var(--fd);font-size:16px;font-weight:800;background:linear-gradient(135deg,var(--text),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0}
+.top-nav{display:flex;gap:2px;flex:1;overflow-x:auto;padding:2px 0;min-width:0}
 .top-nav::-webkit-scrollbar{display:none}
-.nav-tab{padding:7px 14px;border-radius:var(--r-sm);border:none;background:transparent;color:var(--text-d);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);white-space:nowrap;display:flex;align-items:center;gap:7px;transition:all .2s}
+.nav-tab{padding:6px 11px;border-radius:var(--r-sm);border:none;background:transparent;color:var(--text-d);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fb);white-space:nowrap;display:flex;align-items:center;gap:6px;transition:all .2s;flex-shrink:0}
 .nav-tab:hover{background:var(--card);color:var(--text-s)}
 .nav-tab.active{background:var(--primary-g);color:var(--primary)}
-.top-user{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.user-chip{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--card);border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600}
-.user-dot{width:8px;height:8px;border-radius:50%}
-.btn-logout{padding:6px 12px;border-radius:var(--r-sm);background:transparent;border:1px solid var(--border);color:var(--text-d);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.top-user{margin-left:auto;display:flex;align-items:center;gap:7px;flex-shrink:0}
+.user-chip{display:flex;align-items:center;gap:7px;padding:5px 10px;background:var(--card);border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:600}
+.user-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.btn-logout{padding:5px 9px;border-radius:var(--r-sm);background:transparent;border:1px solid var(--border);color:var(--text-d);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .2s}
 .btn-logout:hover{border-color:var(--danger);color:var(--danger)}
-.notif-btn{position:relative;width:36px;height:36px;border-radius:var(--r-sm);background:var(--card);border:1px solid var(--border);color:var(--text-s);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.notif-btn{position:relative;width:32px;height:32px;border-radius:var(--r-sm);background:var(--card);border:1px solid var(--border);color:var(--text-s);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 .notif-btn:hover{border-color:var(--border-l)}
-.notif-badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--danger);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);display:none}
+.notif-badge{position:absolute;top:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:var(--danger);color:#fff;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);display:none}
 .notif-badge.show{display:flex}
 
-.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
-.view{display:none;flex:1;overflow:hidden;flex-direction:column}
+.main{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.view{display:none;flex:1;min-height:0;overflow:hidden;flex-direction:column}
 .view.active{display:flex}
 
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-nav{display:none;height:52px;min-height:52px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+.mobile-nav-inner{display:flex;height:100%}
+.mnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;font-family:var(--fb);color:var(--text-d);font-size:9px;font-weight:600;cursor:pointer;transition:color .2s;padding:0}
+.mnav-item.active{color:var(--primary)}
+@media(max-width:640px){
+  .top-nav{display:none}
+  .mobile-nav{display:flex}
+  .chip-name,.chip-role{display:none}
+  .top-bar{padding:0 8px}
+  .kanban-bar{padding:8px 10px;gap:8px}
+  .kanban-scroll{padding:10px}
+  .k-col{min-width:200px}
+  .hist-toolbar{padding:8px 10px}
+  .map-toolbar{padding:8px 10px}
+}
+
 /* ══ KANBAN ══ */
-.kanban-bar{padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+.kanban-bar{padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap;flex-shrink:0}
 .kanban-title{font-family:var(--fd);font-size:15px;font-weight:700}
 .kpi-chips{display:flex;gap:8px;overflow-x:auto}
 .kpi-chips::-webkit-scrollbar{display:none}
 .kpi-chip{padding:5px 12px;border-radius:16px;font-size:11px;font-weight:700;background:var(--card);border:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;gap:6px}
 .kpi-chip span{font-family:var(--fd);font-size:14px;font-weight:800}
-.kanban-scroll{flex:1;overflow-x:auto;overflow-y:hidden;padding:16px 20px;display:flex;gap:14px;align-items:flex-start}
+.kanban-scroll{flex:1;overflow-x:auto;overflow-y:auto;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;-webkit-overflow-scrolling:touch}
 .kanban-scroll::-webkit-scrollbar{height:6px}
 .k-col{min-width:260px;max-width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:10px}
 .k-col-head{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:var(--r-sm);margin-bottom:2px}
@@ -196,7 +213,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .search-input:focus{border-color:var(--primary)}
 .search-input::placeholder{color:var(--text-f)}
 .filter-select{padding:9px 28px 9px 12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text-s);font-size:12px;font-family:var(--fb);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;color-scheme:dark}
-.hist-scroll{flex:1;overflow:auto;padding:16px 20px}
+.hist-scroll{flex:1;min-height:0;overflow:auto;padding:14px 16px;-webkit-overflow-scrolling:touch}
 .hist-table{width:100%;border-collapse:collapse;min-width:700px}
 .hist-table th{text-align:left;font-size:10px;font-weight:700;color:var(--text-d);letter-spacing:.5px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:1}
 .hist-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid rgba(30,42,66,.5);vertical-align:middle}
@@ -224,7 +241,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .verif-item-name{font-size:13px;font-weight:600}
 .verif-item-status{font-size:11px;color:var(--text-d);margin-top:2px}
 .verif-item-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.map-view-body{flex:1;display:flex;overflow:hidden}
+.map-view-body{flex:1;min-height:0;display:flex;overflow:hidden}
+@media(max-width:640px){.verif-panel{display:none}}
 
 /* ══ LOGIN ══ */
 .login-wrap{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;padding:24px}
@@ -286,19 +304,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .fab:active{transform:scale(.93)}
 
 /* ══ RESPONSIVE ══ */
-@media(max-width:768px){
-  .top-logo{font-size:15px}
-  .nav-tab span{display:none}
-  .user-chip .chip-name{display:none}
-  .verif-panel{display:none}
-  .kanban-scroll{padding:12px}
-  .k-col{min-width:220px}
-}
 @media(max-width:480px){
   .hist-stats{grid-template-columns:1fr 1fr}
   .criterio-grid{grid-template-columns:1fr}
   .row2{grid-template-columns:1fr}
-  .modal{max-height:95vh}
+  .modal{max-height:96dvh;border-radius:var(--r) var(--r) 0 0;margin:auto 0 0}
+  .verif-panel{display:none}
+  .overlay{padding:0;align-items:flex-end}
 }
 
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;color:var(--text-f)}
@@ -460,10 +472,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--success)"></div>Activo</div>
           <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--text-f)"></div>Inactivo</div>
         </div>
-        <span style="font-size:11px;color:var(--text-f);margin-left:auto" id="mapaLastUpdate"></span>
+        <button class="btn btn-ghost btn-sm" onclick="verHistorialRuta()" style="margin-left:auto;font-size:11px">📋 Historial ruta</button>
+        <span style="font-size:11px;color:var(--text-f)" id="mapaLastUpdate"></span>
       </div>
-      <div class="map-view-body">
-        <div id="mapa"></div>
+      <div class="map-view-body" style="flex:1;min-height:0">
+        <div id="mapa" style="flex:1;min-height:0"></div>
         <div class="verif-panel">
           <div class="verif-panel-head">Verificadores</div>
           <div id="verifList">
@@ -474,9 +487,38 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           </div>
         </div>
       </div>
+      <!-- Panel historial ruta (oculto por defecto) -->
+      <div id="histRutaPanel" style="display:none;border-top:1px solid var(--border);background:var(--surface);padding:12px 16px;max-height:200px;overflow-y:auto;flex-shrink:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-size:12px;font-weight:700;color:var(--text-d);text-transform:uppercase;letter-spacing:.5px">Historial de ruta del día</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="histRutaVerif" onchange="cargarHistorialRuta()" style="padding:5px 24px 5px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text-s);font-size:11px;font-family:var(--fb);outline:none;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 6px center;color-scheme:dark"></select>
+            <button onclick="document.getElementById('histRutaPanel').style.display='none'" style="border:none;background:none;color:var(--text-f);cursor:pointer;font-size:16px;line-height:1">×</button>
+          </div>
+        </div>
+        <div id="histRutaContent" style="display:flex;flex-direction:column;gap:4px;font-size:12px"></div>
+      </div>
     </div>
 
   </div><!-- /main -->
+
+  <!-- BOTTOM NAV MÓVIL -->
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-inner">
+      <button class="mnav-item active" id="mnav-kanban" onclick="switchView('kanban')">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Kanban
+      </button>
+      <button class="mnav-item" id="mnav-historial" onclick="switchView('historial')">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Historial
+      </button>
+      <button class="mnav-item" id="mnav-mapa" onclick="switchView('mapa')">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
+        Mapa
+      </button>
+    </div>
+  </div>
 </div><!-- /app -->
 
 <!-- ══ NOTIF DRAWER ══ -->
@@ -598,8 +640,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 // ══════════════════════════════════════════
 //  CONFIG — REEMPLAZAR CON TUS DATOS DE SUPABASE
 // ══════════════════════════════════════════
-const SUPABASE_URL  = 'https://smaqcarchvtniimryxyr.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtYXFjYXJjaHZ0bmlpbXJ5eHlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNjA5MjEsImV4cCI6MjA5NzgzNjkyMX0.7ZGSYlKKnJFtAPBf7t7eXsiMdcMz9Z67U5LZxcLgzEU';
+const SUPABASE_URL  = 'https://TU_PROYECTO.supabase.co';
+const SUPABASE_ANON = 'TU_ANON_KEY';
 
 // ══════════════════════════════════════════
 //  INIT
@@ -1403,17 +1445,23 @@ function initMapa(){
 // Colores únicos por verificador
 const VERIF_COLORS=['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F97316','#EC4899'];
 let rutasLayer={};
+let mapaInitialFitDone=false; // sólo hacer fitBounds la primera vez
 
 async function actualizarMapa(){
   initMapa();
   const verifs=await cargarUbicaciones();
   const ahora=Date.now();
 
-  // Limpiar markers y rutas anteriores
-  Object.values(mapaMarkers).forEach(m=>{try{m.remove();}catch(e){}});
-  mapaMarkers={};
+  // ── Actualizar sólo los marcadores que cambiaron (no recrear todo) ──
+  // Para rutas sí recreamos (son datos históricos que pueden cambiar)
   Object.values(rutasLayer).forEach(r=>{try{r.remove();}catch(e){}});
   rutasLayer={};
+
+  // Quitar marcadores de verificadores que ya no están
+  const verifIds=new Set(verifs.map(v=>v.verificador_id));
+  Object.keys(mapaMarkers).forEach(id=>{
+    if(!verifIds.has(id)){try{mapaMarkers[id].remove();}catch(e){}delete mapaMarkers[id];}
+  });
 
   const lista=document.getElementById('verifList');
   if(!verifs.length){
@@ -1422,7 +1470,7 @@ async function actualizarMapa(){
   }
 
   lista.innerHTML='';
-  const bounds=[];
+  const firstTimeBounds=[];
 
   for(let vi=0;vi<verifs.length;vi++){
     const v=verifs[vi];
@@ -1431,7 +1479,7 @@ async function actualizarMapa(){
     const activo=v.activo&&mins<10;
     const color=VERIF_COLORS[vi%VERIF_COLORS.length];
 
-    // ── Cargar historial GPS del día ──
+    // ── Cargar historial GPS del día (ruta) ──
     const hoy=new Date().toISOString().slice(0,10);
     const {data:gpsHist}=await db.from('historial_gps_verificador')
       .select('lat,lng,timestamp')
@@ -1439,53 +1487,64 @@ async function actualizarMapa(){
       .eq('fecha_dia',hoy)
       .order('timestamp',{ascending:true});
 
-    // Dibujar ruta del día como polyline
     if(gpsHist&&gpsHist.length>1){
       const lls=gpsHist.map(g=>[g.lat,g.lng]);
-      const ruta=L.polyline(lls,{color,weight:3,opacity:.65,dashArray:'none'}).addTo(mapaL);
-      rutasLayer[v.verificador_id]=ruta;
-      lls.forEach(ll=>bounds.push(ll));
-
-      // Marcador de inicio del día
-      const inicio=gpsHist[0];
-      L.circleMarker([inicio.lat,inicio.lng],{radius:5,color,fillColor:color,fillOpacity:.7,weight:2})
+      rutasLayer[v.verificador_id]=L.polyline(lls,{color,weight:3,opacity:.7}).addTo(mapaL);
+      // Punto de inicio
+      L.circleMarker(lls[0],{radius:5,color,fillColor:color,fillOpacity:.9,weight:2})
         .addTo(mapaL)
-        .bindPopup(`<strong>${v.nombre}</strong><br>Inicio: ${new Date(inicio.timestamp).toLocaleTimeString('es-HN',{hour:'2-digit',minute:'2-digit'})}`);
+        .bindPopup(`${v.nombre} — inicio ${new Date(gpsHist[0].timestamp).toLocaleTimeString('es-HN',{hour:'2-digit',minute:'2-digit'})}`);
     }
 
-    // ── Marker posición actual ──
-    const icon=L.divIcon({
-      html:`<div style="width:38px;height:38px;border-radius:50%;background:${activo?color:'#4B5563'};border:3px solid ${activo?color+'99':'#6B728099'};display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 10px rgba(0,0,0,.5);transition:all .3s">👤</div>`,
-      className:'',iconSize:[38,38],iconAnchor:[19,19]
-    });
-    const marker=L.marker([v.lat,v.lng],{icon}).addTo(mapaL);
-    marker.bindPopup(`<div style="font-family:sans-serif;min-width:140px">
-      <strong style="font-size:14px">${v.nombre}</strong><br>
+    // ── Marcador posición actual (mover si ya existe, crear si no) ──
+    const iconHtml=`<div style="width:36px;height:36px;border-radius:50%;background:${activo?color:'#4B5563'};border:3px solid ${activo?'#fff':'#6B7280'};display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 10px rgba(0,0,0,.6)">👤</div>`;
+    const icon=L.divIcon({html:iconHtml,className:'',iconSize:[36,36],iconAnchor:[18,18]});
+    const popupContent=`<div style="min-width:150px;font-family:sans-serif">
+      <strong>${v.nombre}</strong><br>
       <span style="color:${activo?'#10B981':'#9CA3AF'}">${activo?'🟢 En campo':'⚫ Inactivo'}</span><br>
       <span style="font-size:12px;color:#6B7280">Hace ${mins} min</span>
-      ${gpsHist?.length?`<br><span style="font-size:12px;color:#6B7280">${gpsHist.length} puntos registrados hoy</span>`:''}
-    </div>`);
-    mapaMarkers[v.verificador_id]=marker;
-    bounds.push([v.lat,v.lng]);
+      ${gpsHist?.length?`<br><span style="font-size:12px;color:#6B7280">📍 ${gpsHist.length} puntos hoy</span>`:''}
+    </div>`;
+
+    if(mapaMarkers[v.verificador_id]){
+      // Solo mover el marcador existente — sin parpadeo
+      mapaMarkers[v.verificador_id].setLatLng([v.lat,v.lng]);
+      mapaMarkers[v.verificador_id].setIcon(icon);
+      mapaMarkers[v.verificador_id].setPopupContent(popupContent);
+    } else {
+      const marker=L.marker([v.lat,v.lng],{icon}).addTo(mapaL);
+      marker.bindPopup(popupContent);
+      marker.on('click',()=>marker.openPopup());
+      mapaMarkers[v.verificador_id]=marker;
+    }
+
+    firstTimeBounds.push([v.lat,v.lng]);
 
     // ── Lista lateral ──
     const div=document.createElement('div');
     div.className='verif-item';
-    div.innerHTML=`
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="verif-item-dot" style="background:${activo?color:'#4B5563'}"></div>
-        <div style="flex:1">
-          <div class="verif-item-name">${esc(v.nombre)}</div>
-          <div class="verif-item-status">${activo?`Activo · hace ${mins} min`:`Inactivo · hace ${mins} min`}</div>
-          ${gpsHist?.length?`<div style="font-size:10px;color:var(--text-f);margin-top:1px">${gpsHist.length} pts registrados hoy</div>`:''}
-        </div>
-      </div>`;
-    div.onclick=()=>{mapaL.flyTo([v.lat,v.lng],16);marker.openPopup();};
+    div.innerHTML=`<div style="display:flex;align-items:center;gap:8px">
+      <div class="verif-item-dot" style="background:${activo?color:'#4B5563'}"></div>
+      <div style="flex:1">
+        <div class="verif-item-name">${esc(v.nombre)}</div>
+        <div class="verif-item-status">${activo?`🟢 Activo · hace ${mins} min`:`⚫ Inactivo · hace ${mins} min`}</div>
+        ${gpsHist?.length?`<div style="font-size:10px;color:var(--text-f);margin-top:2px">📍 ${gpsHist.length} puntos de ruta hoy</div>`:''}
+      </div>
+    </div>`;
+    div.onclick=()=>{
+      mapaL.setView([v.lat,v.lng],16,{animate:true,duration:0.8});
+      mapaMarkers[v.verificador_id]?.openPopup();
+    };
     lista.appendChild(div);
   }
 
-  if(bounds.length) mapaL.fitBounds(L.latLngBounds(bounds),{padding:[20,20]});
-  document.getElementById('mapaLastUpdate').textContent='Actualizado: '+new Date().toLocaleTimeString('es-HN');
+  // Solo hacer fitBounds la primera carga — luego el usuario controla el zoom
+  if(!mapaInitialFitDone&&firstTimeBounds.length){
+    mapaL.fitBounds(L.latLngBounds(firstTimeBounds),{padding:[24,24],maxZoom:15});
+    mapaInitialFitDone=true;
+  }
+
+  document.getElementById('mapaLastUpdate').textContent='Act: '+new Date().toLocaleTimeString('es-HN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
 
 // ══ NOTIFICACIONES ═══════════════════
@@ -1556,13 +1615,25 @@ async function registrarHistorial(solId,accion,estatusNuevo,estatusAnterior,meta
 }
 
 // ══ VISTAS ═══════════════════════════
+let mapaAutoInterval=null;
 function switchView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.mnav-item').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
-  document.getElementById('tab-'+v).classList.add('active');
+  const dt=document.getElementById('tab-'+v);if(dt)dt.classList.add('active');
+  const dm=document.getElementById('mnav-'+v);if(dm)dm.classList.add('active');
   if(v==='historial')renderHistorial();
-  if(v==='mapa'){actualizarMapa();setInterval(actualizarMapa,30000);}
+  if(v==='mapa'){
+    if(mapaAutoInterval)clearInterval(mapaAutoInterval);
+    mapaInitialFitDone=false; // reset para ajustar vista al entrar
+    actualizarMapa();
+    mapaAutoInterval=setInterval(actualizarMapa,30000);
+    // Leaflet necesita que el contenedor sea visible para calcular tamaño
+    setTimeout(()=>{if(mapaL)mapaL.invalidateSize();},100);
+  } else {
+    if(mapaAutoInterval){clearInterval(mapaAutoInterval);mapaAutoInterval=null;}
+  }
 }
 
 // ══ FUNCIÓN RPC (agregar en Supabase) ══
@@ -1580,6 +1651,71 @@ BEGIN
 END;
 $$;
 */
+
+// ══ HISTORIAL RUTA ═══════════════════
+async function verHistorialRuta(){
+  const panel=document.getElementById('histRutaPanel');
+  const sel=document.getElementById('histRutaVerif');
+  // Poblar select con verificadores
+  const {data}=await db.from('usuarios').select('id,nombre').eq('rol','verificador').eq('activo',true);
+  if(data?.length){
+    sel.innerHTML=data.map(u=>`<option value="${u.id}">${esc(u.nombre)}</option>`).join('');
+  }
+  panel.style.display=panel.style.display==='none'?'block':'none';
+  if(panel.style.display!=='none') cargarHistorialRuta();
+}
+
+async function cargarHistorialRuta(){
+  const sel=document.getElementById('histRutaVerif');
+  const verifId=sel.value;
+  if(!verifId) return;
+  const hoy=new Date().toISOString().slice(0,10);
+  const {data}=await db.from('historial_gps_verificador')
+    .select('lat,lng,timestamp,solicitud_activa')
+    .eq('verificador_id',verifId)
+    .eq('fecha_dia',hoy)
+    .order('timestamp',{ascending:true});
+  
+  const cont=document.getElementById('histRutaContent');
+  if(!data?.length){cont.innerHTML='<div style="color:var(--text-f);padding:8px 0">Sin registros GPS hoy para este verificador</div>';return;}
+  
+  // Calcular distancia total haversine
+  let distTotal=0;
+  const puntos=data.map((p,i)=>{
+    let dist=0;
+    if(i>0){
+      const prev=data[i-1];
+      const R=6371000;
+      const dLat=(p.lat-prev.lat)*Math.PI/180;const dLng=(p.lng-prev.lng)*Math.PI/180;
+      const a=Math.sin(dLat/2)**2+Math.cos(prev.lat*Math.PI/180)*Math.cos(p.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+      dist=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+      distTotal+=dist;
+    }
+    return{...p,dist};
+  });
+
+  cont.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:6px;color:var(--text-s)">
+    <span><strong>${data.length}</strong> puntos registrados</span>
+    <span>Distancia total: <strong style="color:var(--primary)">${distTotal>=1000?(distTotal/1000).toFixed(2)+'km':Math.round(distTotal)+'m'}</strong></span>
+  </div>`+puntos.map((p,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(30,42,66,.4)">
+      <div style="width:22px;height:22px;border-radius:50%;background:var(--primary-g);border:1px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--primary);flex-shrink:0">${i+1}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:600">${new Date(p.timestamp).toLocaleTimeString('es-HN',{hour:'2-digit',minute:'2-digit'})}</div>
+        <div style="font-size:10px;color:var(--text-f)">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</div>
+      </div>
+      <div style="font-size:10px;color:var(--text-d);text-align:right;flex-shrink:0">
+        ${i>0?`+${p.dist>=1000?(p.dist/1000).toFixed(1)+'km':Math.round(p.dist)+'m'}`:'inicio'}
+        <br><a href="https://maps.google.com/?q=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);font-size:10px">Maps</a>
+      </div>
+    </div>`).join('');
+
+  // Resaltar en mapa si está abierto
+  if(mapaL&&data.length){
+    const lls=data.map(p=>[p.lat,p.lng]);
+    mapaL.setView(lls[lls.length-1],14,{animate:true,duration:0.8});
+  }
+}
 
 // ══ BOOT ═════════════════════════════
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});

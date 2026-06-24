@@ -279,11 +279,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div id="dashList"></div>
   </div>
   <nav class="bnav">
-    <button class="bnav-item active" onclick="goScreen('sDash')">
+    <button class="bnav-item active" id="bnav-sDash" onclick="goScreen('sDash')">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Inicio
     </button>
-    <button class="bnav-item" onclick="goScreen('sHist')">
+    <button class="bnav-item" id="bnav-sRuta" onclick="goScreen('sRuta')">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      Ruta
+    </button>
+    <button class="bnav-item" id="bnav-sHist" onclick="goScreen('sHist')">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
       Historial
     </button>
@@ -324,11 +328,37 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Inicio
     </button>
+    <button class="bnav-item" onclick="goScreen('sRuta')">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      Ruta
+    </button>
     <button class="bnav-item active" onclick="goScreen('sHist')">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
       Historial
     </button>
   </nav>
+</div>
+
+<!-- ══ SCREEN: RUTA DEL DÍA ══ -->
+<div class="screen" id="sRuta">
+  <div class="header">
+    <div class="header-left">
+      <button class="btn-back" onclick="goScreen('sDash')">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div>
+        <div class="header-title">Mi ruta del día</div>
+        <div style="font-size:11px;color:var(--text-d)" id="rutaSubtitle">Cargando...</div>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="optimizarRutaGlobal()">🗺 Optimizar</button>
+  </div>
+  <!-- Mapa de ruta -->
+  <div id="mapaRuta" style="height:42dvh;min-height:200px;flex-shrink:0;border-bottom:1px solid var(--border)"></div>
+  <!-- Stats de ruta -->
+  <div id="rutaStats" style="display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0"></div>
+  <!-- Lista de todos los puntos del día -->
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px;display:flex;flex-direction:column;gap:8px" id="rutaList"></div>
 </div>
 
 <!-- ══ SCREEN: NOTIFICACIONES ══ -->
@@ -368,8 +398,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 // ══════════════════════════════
 //  CONFIG — REEMPLAZAR CON TUS CLAVES
 // ══════════════════════════════
-const SUPABASE_URL  = 'https://smaqcarchvtniimryxyr.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtYXFjYXJjaHZ0bmlpbXJ5eHlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNjA5MjEsImV4cCI6MjA5NzgzNjkyMX0.7ZGSYlKKnJFtAPBf7t7eXsiMdcMz9Z67U5LZxcLgzEU';
+const SUPABASE_URL  = 'https://TU_PROYECTO.supabase.co';
+const SUPABASE_ANON = 'TU_ANON_KEY';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -416,11 +446,138 @@ function badgeHtml(e){
 }
 
 // ── SCREENS ───────────────────
+let mapaRutaL=null;
 function goScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // Update bnav active state
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  const bk='bnav-'+id;
+  const bel=document.getElementById(bk);if(bel)bel.classList.add('active');
   if(id==='sHist') renderHist();
   if(id==='sNotif') renderNotif();
+  if(id==='sRuta') renderRuta();
+}
+
+// ── MÓDULO RUTA DEL DÍA ──────────────
+async function renderRuta(){
+  // Recopilar TODOS los puntos de todas las solicitudes activas del verificador
+  const todasSols=SOLIS.filter(s=>s.verificador_id===SES.id||s.estatus==='aprobado');
+  const todosPuntos=[];
+  todasSols.forEach(s=>{
+    const pts=s.puntos_verificacion||[];
+    pts.forEach(p=>todosPuntos.push({...p,cliente:s.cliente,solicitudId:s.id,montoSol:s.monto}));
+  });
+
+  const noVisitados=todosPuntos.filter(p=>!p.visitado);
+  const visitados=todosPuntos.filter(p=>p.visitado);
+
+  document.getElementById('rutaSubtitle').textContent=`${noVisitados.length} pendientes · ${visitados.length} visitados`;
+
+  // Stats bar
+  const totalKm=todosPuntos.filter(p=>p.distancia_km_ruta).reduce((a,p)=>a+(p.distancia_km_ruta||0),0);
+  document.getElementById('rutaStats').innerHTML=`
+    <div style="flex:1;text-align:center;padding:10px 6px;border-right:1px solid var(--border)">
+      <div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--primary)">${todosPuntos.length}</div>
+      <div style="font-size:10px;color:var(--text-d);font-weight:700;text-transform:uppercase;margin-top:2px">Puntos</div>
+    </div>
+    <div style="flex:1;text-align:center;padding:10px 6px;border-right:1px solid var(--border)">
+      <div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--success)">${visitados.length}</div>
+      <div style="font-size:10px;color:var(--text-d);font-weight:700;text-transform:uppercase;margin-top:2px">Visitados</div>
+    </div>
+    <div style="flex:1;text-align:center;padding:10px 6px">
+      <div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--accent)">${totalKm>0?totalKm.toFixed(1)+'km':'—'}</div>
+      <div style="font-size:10px;color:var(--text-d);font-weight:700;text-transform:uppercase;margin-top:2px">Km estimados</div>
+    </div>`;
+
+  // Lista
+  const lista=document.getElementById('rutaList');
+  if(!todosPuntos.length){
+    lista.innerHTML=`<div class="empty"><div class="empty-icon"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg></div><div class="empty-title">Sin puntos en ruta</div><div class="empty-sub">Abre una solicitud y agrega puntos de trabajo y domicilio</div></div>`;
+    initMapaRuta([]);return;
+  }
+
+  lista.innerHTML=[...noVisitados,...visitados].map((p,i)=>`
+    <div class="punto-item${p.visitado?' punto-done':''}" style="cursor:${p.coords?'pointer':'default'}" onclick="${p.coords?`flyToRutaPunto(${p.coords.split(',')[0]},${p.coords.split(',')[1]})`:''}">
+      <div class="punto-num">${p.visitado?'✓':i+1}</div>
+      <div class="punto-info">
+        <div class="punto-nombre">${esc(p.nombre)}</div>
+        <div class="punto-dist" style="color:${p.visitado?'var(--success)':'var(--text-d)'}">
+          ${esc(p.cliente)} · ${p.tipo}
+          ${p.distancia_km_ruta?` · ~${p.distancia_km_ruta.toFixed(1)}km`:''}
+        </div>
+        ${p.coords?`<a href="https://maps.google.com/?q=${p.coords}&navigate=yes" target="_blank" style="font-size:11px;color:var(--primary)">Navegar en Maps →</a>`:''}
+      </div>
+      <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0">${fmtM(p.montoSol)}</div>
+    </div>`).join('');
+
+  initMapaRuta(todosPuntos);
+}
+
+function flyToRutaPunto(lat,lng){
+  if(mapaRutaL) mapaRutaL.setView([parseFloat(lat),parseFloat(lng)],17,{animate:true,duration:0.6});
+}
+
+function initMapaRuta(pts){
+  const el=document.getElementById('mapaRuta');
+  if(!el) return;
+  if(mapaRutaL){mapaRutaL.remove();mapaRutaL=null;}
+  mapaRutaL=L.map('mapaRuta',{zoomControl:true,attributionControl:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(mapaRutaL);
+
+  const bounds=[];
+  // Posición actual
+  if(lastPos){
+    L.circleMarker([lastPos.lat,lastPos.lng],{radius:9,color:'#3B82F6',fillColor:'#3B82F6',fillOpacity:1,weight:2})
+      .addTo(mapaRutaL).bindPopup('<strong>Tu posición</strong>');
+    bounds.push([lastPos.lat,lastPos.lng]);
+  }
+
+  const withCoords=pts.filter(p=>p.coords);
+  withCoords.forEach((p,i)=>{
+    const parts=p.coords.split(',').map(Number);
+    if(isNaN(parts[0])||isNaN(parts[1])) return;
+    const color=p.visitado?'#10B981':'#F59E0B';
+    const icon=L.divIcon({
+      html:`<div style="width:30px;height:30px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.4)">${p.visitado?'✓':i+1}</div>`,
+      className:'',iconSize:[30,30],iconAnchor:[15,15]
+    });
+    L.marker([parts[0],parts[1]],{icon}).addTo(mapaRutaL)
+      .bindPopup(`<strong>${p.nombre}</strong><br>${p.cliente}<br>${p.tipo}`);
+    bounds.push([parts[0],parts[1]]);
+  });
+
+  // Línea de ruta
+  if(bounds.length>1){
+    const allPts=lastPos?[[lastPos.lat,lastPos.lng],...withCoords.map(p=>p.coords.split(',').map(Number))]:withCoords.map(p=>p.coords.split(',').map(Number));
+    L.polyline(allPts.filter(p=>!isNaN(p[0])),{color:'#3B82F6',weight:2.5,dashArray:'6,4',opacity:.8}).addTo(mapaRutaL);
+  }
+
+  if(bounds.length) mapaRutaL.fitBounds(L.latLngBounds(bounds),{padding:[20,20],maxZoom:15});
+  else if(lastPos) mapaRutaL.setView([lastPos.lat,lastPos.lng],13);
+  else mapaRutaL.setView([15.5,-87.9],10);
+}
+
+async function optimizarRutaGlobal(){
+  // Recoger todos los puntos con coordenadas de todas las solicitudes activas
+  const todasSols=SOLIS.filter(s=>s.verificador_id===SES.id&&s.estatus==='en_verificacion');
+  if(!todasSols.length){toast('No hay solicitudes activas asignadas','warning');return;}
+
+  let actualizadas=0;
+  for(const s of todasSols){
+    const pts=s.puntos_verificacion||[];
+    if(pts.length>=2){
+      // Usar la función de optimización de la solicitud
+      const old=detId;detId=s.id;
+      const oldPuntos=[...puntos];
+      puntos=[...pts];
+      await optimizarRuta();
+      puntos=oldPuntos;detId=old;
+      actualizadas++;
+    }
+  }
+  toast(actualizadas>0?`Ruta optimizada en ${actualizadas} solicitud(es)`:'Sin puntos suficientes para optimizar','info');
+  renderRuta();
 }
 
 // ── LOGIN ──────────────────────
